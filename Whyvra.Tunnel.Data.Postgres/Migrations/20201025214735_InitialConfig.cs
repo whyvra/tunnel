@@ -15,6 +15,7 @@ namespace Whyvra.Tunnel.Data.Postgres.Migrations
                 columns: table => new
                 {
                     Id = table.Column<int>(nullable: false)
+                        .Annotation("Npgsql:IdentitySequenceOptions", "'3', '1', '', '', 'False', '1'")
                         .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
                     Address = table.Column<ValueTuple<IPAddress, int>>(nullable: false),
                     CreatedAt = table.Column<DateTime>(nullable: false),
@@ -44,6 +45,7 @@ namespace Whyvra.Tunnel.Data.Postgres.Migrations
                 columns: table => new
                 {
                     Id = table.Column<int>(nullable: false)
+                        .Annotation("Npgsql:IdentitySequenceOptions", "'2', '1', '', '', 'False', '1'")
                         .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
                     Email = table.Column<string>(maxLength: 128, nullable: false),
                     FirstName = table.Column<string>(maxLength: 64, nullable: false),

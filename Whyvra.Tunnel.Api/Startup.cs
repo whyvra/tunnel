@@ -1,5 +1,6 @@
 using System.Reflection;
 using System.Text.Json;
+using FluentValidation.AspNetCore;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc.ApplicationModels;
@@ -8,8 +9,11 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Whyvra.Accounts.Api.Filters;
 using Whyvra.Tunnel.Api.Authentication;
 using Whyvra.Tunnel.Api.Configuration;
+using Whyvra.Tunnel.Common.Commands;
+using Whyvra.Tunnel.Common.Json;
 using Whyvra.Tunnel.Core;
 using Whyvra.Tunnel.Core.Users;
 using Whyvra.Tunnel.Data;
@@ -46,11 +50,14 @@ namespace Whyvra.Tunnel.Api
                 AddControllers(x =>
                 {
                     x.Conventions.Add(new RouteTokenTransformerConvention(new SlugifyParameterTransformer()));
+                    x.Filters.Add(new HttpExceptionFilter());
+                    x.Filters.Add(new ValidationFilter());
                     if (authOptions.Enabled)
                     {
                         x.Filters.Add(new AuthorizeFilter());
                     }
                 })
+                .AddFluentValidation(x => x.RegisterValidatorsFromAssemblyContaining<CreateServerCommandValidator>())
                 .AddJsonOptions(x =>
                 {
                     x.JsonSerializerOptions.IgnoreNullValues = true;

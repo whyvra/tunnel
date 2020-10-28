@@ -17,6 +17,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Whyvra.Tunnel.Core", "Whyvr
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Whyvra.Tunnel.Api", "Whyvra.Tunnel.Api\Whyvra.Tunnel.Api.csproj", "{0F9B5A73-B64C-40F6-B139-9573C9391382}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Whyvra.Tunnel.Presentation", "Whyvra.Tunnel.Presentation\Whyvra.Tunnel.Presentation.csproj", "{AD0B63E0-C57E-4AE9-9AC6-AB8447C7872D}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -114,5 +116,17 @@ Global
 		{0F9B5A73-B64C-40F6-B139-9573C9391382}.Release|x64.Build.0 = Release|Any CPU
 		{0F9B5A73-B64C-40F6-B139-9573C9391382}.Release|x86.ActiveCfg = Release|Any CPU
 		{0F9B5A73-B64C-40F6-B139-9573C9391382}.Release|x86.Build.0 = Release|Any CPU
+		{AD0B63E0-C57E-4AE9-9AC6-AB8447C7872D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{AD0B63E0-C57E-4AE9-9AC6-AB8447C7872D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{AD0B63E0-C57E-4AE9-9AC6-AB8447C7872D}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{AD0B63E0-C57E-4AE9-9AC6-AB8447C7872D}.Debug|x64.Build.0 = Debug|Any CPU
+		{AD0B63E0-C57E-4AE9-9AC6-AB8447C7872D}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{AD0B63E0-C57E-4AE9-9AC6-AB8447C7872D}.Debug|x86.Build.0 = Debug|Any CPU
+		{AD0B63E0-C57E-4AE9-9AC6-AB8447C7872D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{AD0B63E0-C57E-4AE9-9AC6-AB8447C7872D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{AD0B63E0-C57E-4AE9-9AC6-AB8447C7872D}.Release|x64.ActiveCfg = Release|Any CPU
+		{AD0B63E0-C57E-4AE9-9AC6-AB8447C7872D}.Release|x64.Build.0 = Release|Any CPU
+		{AD0B63E0-C57E-4AE9-9AC6-AB8447C7872D}.Release|x86.ActiveCfg = Release|Any CPU
+		{AD0B63E0-C57E-4AE9-9AC6-AB8447C7872D}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal

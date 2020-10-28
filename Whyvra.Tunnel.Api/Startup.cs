@@ -13,7 +13,6 @@ using Whyvra.Accounts.Api.Filters;
 using Whyvra.Tunnel.Api.Authentication;
 using Whyvra.Tunnel.Api.Configuration;
 using Whyvra.Tunnel.Common.Commands;
-using Whyvra.Tunnel.Common.Json;
 using Whyvra.Tunnel.Core;
 using Whyvra.Tunnel.Core.Users;
 using Whyvra.Tunnel.Data;

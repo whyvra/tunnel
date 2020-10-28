@@ -233,6 +233,10 @@ namespace Whyvra.Tunnel.Data.Sqlite.Migrations
                         .HasColumnType("TEXT")
                         .HasMaxLength(128);
 
+                    b.Property<bool>("IsRevoked")
+                        .IsRequired()
+                        .HasColumnType("INTEGER");
+
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasColumnType("TEXT")

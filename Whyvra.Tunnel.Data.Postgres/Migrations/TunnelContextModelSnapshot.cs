@@ -240,6 +240,10 @@ namespace Whyvra.Tunnel.Data.Postgres.Migrations
                         .HasColumnType("character varying(128)")
                         .HasMaxLength(128);
 
+                    b.Property<bool>("IsRevoked")
+                        .IsRequired()
+                        .HasColumnType("boolean");
+
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasColumnType("character varying(64)")

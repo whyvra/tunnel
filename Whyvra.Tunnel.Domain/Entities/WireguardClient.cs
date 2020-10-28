@@ -14,6 +14,8 @@ namespace Whyvra.Tunnel.Domain.Entitites
 
         public (IPAddress addr, int cidr) AssignedIp { get; set; }
 
+        public bool IsRevoked { get; set; }
+
         public string PublicKey { get; set; }
 
         public int ServerId { get; set; }

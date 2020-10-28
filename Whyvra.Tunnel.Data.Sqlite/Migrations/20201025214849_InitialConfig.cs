@@ -61,6 +61,7 @@ namespace Whyvra.Tunnel.Data.Sqlite.Migrations
                     Name = table.Column<string>(maxLength: 64, nullable: false),
                     Description = table.Column<string>(maxLength: 128, nullable: true),
                     AssignedIp = table.Column<string>(nullable: false),
+                    IsRevoked = table.Column<bool>(nullable: false),
                     PublicKey = table.Column<string>(maxLength: 44, nullable: false),
                     ServerId = table.Column<int>(nullable: false),
                     CreatedAt = table.Column<DateTime>(nullable: false),

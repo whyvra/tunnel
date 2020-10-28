@@ -24,6 +24,9 @@ namespace Whyvra.Tunnel.Data.Configuration
             builder.HasIndex(x => x.AssignedIp)
                 .IsUnique();
 
+            builder.Property(x => x.IsRevoked)
+                .IsRequired();
+
             builder.Property(x => x.PublicKey)
                 .HasMaxLength(44)
                 .IsRequired();

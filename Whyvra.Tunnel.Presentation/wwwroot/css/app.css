@@ -1,3 +1,37 @@
 html {
     overflow-y: auto;
 }
+
+.navbar-brand img.brand-logo {
+    max-height: 3rem;
+}
+
+.jumbotron {
+    background-color: #343c3d;
+    border-radius: 7px;
+    margin-bottom: 3rem;
+    margin-top: 1.5rem;
+    padding: 3rem 2rem 3rem 2rem;
+}
+
+.jumbotron > .banner {
+    align-items: center;
+    display: flex;
+    overflow: hidden;
+}
+
+.jumbotron div.actions-panel {
+    padding-top: 2rem;
+}
+
+.info-tile {
+    padding-bottom: 3rem;
+}
+
+.info-tile h2 {
+    padding-bottom: 1rem;
+}
+
+.info-tile h2 > .icon {
+    padding-right: 10px;
+}

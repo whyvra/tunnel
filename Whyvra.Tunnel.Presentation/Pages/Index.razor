@@ -1,8 +1,86 @@
-﻿@page "/"
+﻿@using Whyvra.Tunnel.Presentation.Services
+@using Whyvra.Tunnel.Common.Models
 
-<h1 class="title">
-    Home
-</h1>
-<p class="subtitle">
-    My first website with <strong>Blazor</strong>!
-</p>
+@inject IOptions<AuthenticationOptions> Auth
+@inject ServerService ServerService
+
+@page "/"
+
+<div class="jumbotron">
+    <div class="banner">
+        <img src="img/icon.png" height="128" width="128" style="float: left; padding-right: 1.5em;">
+        <div>
+            <h1 class="title">
+                Tunnel
+            </h1>
+            <p class="subtitle">
+                The secure manager for your WireGuard clients
+            </p>
+        </div>
+    </div>
+    
+    <div class="actions-panel">
+        @if (Auth.Value.Enabled)
+        {
+        <button class="button is-success">
+            <span class="icon">
+                <i class="fas fa-sign-in-alt"></i>
+            </span>
+            <span>Login</span>
+        </button>
+        }
+        else
+        {
+        <div class="select">
+            <select>
+                <option disabled>Select a server</option>
+                @foreach(var server in servers)
+                {
+                <option>@server.Name</option>
+                }
+            </select>
+        </div>
+        }
+    </div>
+</div>
+@if (tiles != null && tiles.Length > 0)
+{
+<div class="columns is-desktop is-8 is-variable">
+    @foreach (var tile in tiles)
+    {
+    <div class="column is-one-third info-tile">
+        <h2 class="is-size-4 has-text-centered">
+            <span class="icon">
+                <i class="fas fa-@(tile.Icon)"></i>
+            </span>
+            <span>@tile.Title</span>
+        </h2>
+        <p class="is-size-5">@tile.Text</p>
+    </div>
+    }
+</div>
+}
+
+@code
+{
+    struct Tile {
+        public string Icon;
+        public string Title;
+        public string Text;
+    }
+
+    IEnumerable<ServerDto> servers = new ServerDto[0];
+
+    Tile[] tiles = new []
+    {
+        new Tile {Title = "Secure", Icon = "lock", Text = "Your client's private keys are generated client-side using C# (on top of Web Assembly). The private keys are never stored or sent to the server. We only store the public keys."},
+        new Tile {Title = "Cross-platform", Icon = "desktop", Text = "Built with .NET Core which means Tunnel on any of the supported platforms including Windows, Linux and MacOS."},
+        new Tile {Title = "Open Source", Icon = "code", Text = "The code for Tunnel is open-sourced and available publicly via Git. It is published under the MIT license"}
+    };
+
+
+    protected override async Task OnInitializedAsync()
+    {
+        servers = await ServerService.GetAll();
+    }
+}

@@ -1,8 +1,8 @@
 <nav class="navbar is-fixed-top" role="navigation" aria-label="main navigation">
     <div class="navbar-brand">
-        <div class="navbar-item">
-            <img src="img/logo.png" width="112 " height="28">
-        </div>
+        <NavLink class="navbar-item" href="#" ActiveClass="is-active">
+            <img class="brand-logo" src="img/logo.png" width="150 " height="38">
+        </NavLink>
 
         <a role="button" class="navbar-burger burger @(IsExpanded ? "is-active": "")" aria-label="menu" aria-expanded="false" data-target="tunnelNavbar" @onclick="HandleClick">
             <span aria-hidden="true"></span>

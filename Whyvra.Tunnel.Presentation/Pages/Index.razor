@@ -1,8 +1,10 @@
-﻿@using Whyvra.Tunnel.Presentation.Services
+﻿@using Microsoft.Extensions.DependencyInjection
+@using Whyvra.Tunnel.Presentation.Services
 @using Whyvra.Tunnel.Common.Models
 
 @inject IOptions<AuthenticationOptions> Auth
 @inject ServerService ServerService
+@inject IServiceProvider Services
 
 @page "/"
 
@@ -22,12 +24,28 @@
     <div class="actions-panel">
         @if (Auth.Value.Enabled)
         {
-        <button class="button is-success">
-            <span class="icon">
-                <i class="fas fa-sign-in-alt"></i>
-            </span>
-            <span>Login</span>
-        </button>
+        <AuthorizeView>
+            <Authorized>
+                <div class="select">
+                    <select>
+                        <option disabled>Select a server</option>
+                        @foreach(var server in servers)
+                        {
+                        <option>@server.Name</option>
+                        }
+                    </select>
+                </div>
+            </Authorized>
+            <NotAuthorized>
+                <NavLink class="button is-success" href="authentication/login">
+                    <span class="icon">
+                        <i class="fas fa-sign-in-alt"></i>
+                    </span>
+                    <span>Login</span>
+                </NavLink>
+            </NotAuthorized>
+        </AuthorizeView>
+        
         }
         else
         {
@@ -78,9 +96,20 @@
         new Tile {Title = "Open Source", Icon = "code", Text = "The code for Tunnel is open-sourced and available publicly via Git. It is published under the MIT license"}
     };
 
-
     protected override async Task OnInitializedAsync()
     {
-        servers = await ServerService.GetAll();
+        if (Auth.Value.Enabled)
+        {
+            var provider = Services.GetService<AuthenticationStateProvider>();
+            var state = await provider.GetAuthenticationStateAsync();
+            if (state.User.Identity.IsAuthenticated)
+            {
+                servers = await ServerService.GetAll();
+            }
+        }
+        else
+        {
+            servers = await ServerService.GetAll();
+        }
     }
 }

@@ -1,8 +1,8 @@
 using System;
-using Microsoft.AspNetCore.Components.WebAssembly.Authentication;
 using Microsoft.AspNetCore.Components.WebAssembly.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Whyvra.Tunnel.Presentation.Authentication;
 using Whyvra.Tunnel.Presentation.Configuration;
 using Whyvra.Tunnel.Presentation.Services;
 
@@ -30,13 +30,20 @@ namespace Whyvra.Tunnel.Presentation
             var apiClient = builder.Services.AddHttpClient("TunnelApi", x => x.BaseAddress = new Uri(apiUrl));
             if (auth)
             {
+                // Register custom provider and handle to use id_token instead of access_token for OIDC
+                builder.Services
+                    .AddScoped<IdTokenProvider>()
+                    .AddScoped<CustomAuthorizationMessageHandler>()
+                    .AddOidcAuthentication(x => builder.Configuration.Bind("auth", x.ProviderOptions));
+
                 // Add authorization handler if authentication is enabled
-                apiClient.AddHttpMessageHandler<BaseAddressAuthorizationMessageHandler>();
+                apiClient.AddHttpMessageHandler<CustomAuthorizationMessageHandler>();
             }
 
             // Register services
             builder.Services
-                .AddScoped<ServerService>();
+                .AddScoped<ServerService>()
+                .AddScoped<UserService>();
 
             return services;
         }

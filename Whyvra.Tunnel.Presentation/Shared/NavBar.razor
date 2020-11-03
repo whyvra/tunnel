@@ -1,8 +1,13 @@
+@using Microsoft.AspNetCore.Components.WebAssembly.Authentication
+
+@inject NavigationManager Navigation
+@inject SignOutSessionStateManager SignOutManager
+
 <nav class="navbar is-fixed-top" role="navigation" aria-label="main navigation">
     <div class="navbar-brand">
-        <NavLink class="navbar-item" href="#" ActiveClass="is-active">
+        <div class="navbar-item">
             <img class="brand-logo" src="img/logo.png" width="150 " height="38">
-        </NavLink>
+        </div>
 
         <a role="button" class="navbar-burger burger @(IsExpanded ? "is-active": "")" aria-label="menu" aria-expanded="false" data-target="tunnelNavbar" @onclick="HandleClick">
             <span aria-hidden="true"></span>
@@ -17,6 +22,20 @@
                 Home
             </NavLink>
         </div>
+        <AuthorizeView>
+            <Authorized>
+                <div class="navbar-end">
+                    <div class="navbar-item">
+                        <button class="button" @onclick="BeginSignOut">
+                            <span class="icon">
+                                <i class="fas fa-sign-out-alt"></i>
+                            </span>
+                            <span>Logout</span>
+                        </button>
+                    </div>
+                </div>
+            </Authorized>
+        </AuthorizeView>
     </div>
 </nav>
 
@@ -27,5 +46,11 @@
     private void HandleClick(MouseEventArgs e)
     {
         IsExpanded = !IsExpanded;
+    }
+
+    private async Task BeginSignOut(MouseEventArgs args)
+    {
+        await SignOutManager.SetSignOutState();
+        Navigation.NavigateTo("authentication/logout");
     }
 }

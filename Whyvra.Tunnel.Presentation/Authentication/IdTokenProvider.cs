@@ -32,6 +32,18 @@ namespace Whyvra.Tunnel.Presentation.Authentication
         {
             var value = await _runtime.InvokeAsync<string>("sessionStorage.getItem", key);
             var data = JsonSerializer.Deserialize<UserData>(value);
+            var expiry = DateTimeOffset.FromUnixTimeSeconds(data.ExpiresAt);
+
+            if (DateTimeOffset.Now >= expiry.AddMinutes(-5))
+            {
+                // Renew expired token
+                await _runtime.InvokeVoidAsync("AuthenticationService.getAccessToken");
+
+                // Update token data
+                value = await _runtime.InvokeAsync<string>("sessionStorage.getItem", key);
+                data = JsonSerializer.Deserialize<UserData>(value);
+            }
+
             var token = new AccessToken
             {
                 Expires = DateTimeOffset.FromUnixTimeSeconds(data.ExpiresAt),

@@ -1,13 +1,15 @@
 @using Microsoft.AspNetCore.Components.WebAssembly.Authentication
+@using Microsoft.Extensions.DependencyInjection
 
+@inject IOptions<AuthenticationOptions> Auth
+@inject IServiceProvider Services
 @inject NavigationManager Navigation
-@inject SignOutSessionStateManager SignOutManager
 
 <nav class="navbar is-fixed-top" role="navigation" aria-label="main navigation">
     <div class="navbar-brand">
-        <div class="navbar-item">
+        <NavLink class="navbar-item" href="/">
             <img class="brand-logo" src="img/logo.png" width="150 " height="38">
-        </div>
+        </NavLink>
 
         <a role="button" class="navbar-burger burger @(IsExpanded ? "is-active": "")" aria-label="menu" aria-expanded="false" data-target="tunnelNavbar" @onclick="HandleClick">
             <span aria-hidden="true"></span>
@@ -17,11 +19,8 @@
     </div>
 
     <div id="tunnelNavbar" class="navbar-menu @(IsExpanded ? "is-active": "")" @onclick="@(_ => IsExpanded = false)">
-        <div class="navbar-start">
-            <NavLink class="navbar-item" href="/">
-                Home
-            </NavLink>
-        </div>
+        @if (Auth.Value.Enabled)
+        {
         <AuthorizeView>
             <Authorized>
                 <div class="navbar-end">
@@ -36,6 +35,7 @@
                 </div>
             </Authorized>
         </AuthorizeView>
+        }
     </div>
 </nav>
 
@@ -50,7 +50,8 @@
 
     private async Task BeginSignOut(MouseEventArgs args)
     {
-        await SignOutManager.SetSignOutState();
+        var signoutManager = Services.GetService<SignOutSessionStateManager>();
+        await signoutManager.SetSignOutState();
         Navigation.NavigateTo("authentication/logout");
     }
 }

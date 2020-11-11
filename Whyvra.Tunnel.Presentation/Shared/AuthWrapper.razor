@@ -1,0 +1,28 @@
+@inherits LayoutComponentBase
+
+@inject IOptions<AuthenticationOptions> Auth
+
+@if(Auth.Value.Enabled)
+{
+<AuthorizeView>
+    <Authorized>
+        @ChildContent
+    </Authorized>
+    <NotAuthorized>
+        @NotAuthorizedContent
+    </NotAuthorized>
+</AuthorizeView>
+}
+else
+{
+    @ChildContent
+}
+
+@code
+{
+    [Parameter]
+    public RenderFragment ChildContent { get; set; }
+
+    [Parameter]
+    public RenderFragment NotAuthorizedContent { get; set; }
+}

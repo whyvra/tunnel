@@ -1,0 +1,35 @@
+@using Whyvra.Blazor.Forms.Renderer
+@using Whyvra.Tunnel.Common.Models
+@using Whyvra.Tunnel.Presentation.Services
+
+@inject ServerService ServerService
+
+@if (_server != null)
+{
+    <BulmaForm FormModel="_formModel" FormViewMode="@FormViewMode.Readonly"></BulmaForm>
+}
+
+@code
+{
+    private FormModel<ServerDto> _formModel;
+    private ServerDto _server;
+
+    [Parameter]
+    public int ServerId { get; set; }
+    protected override async Task OnInitializedAsync()
+    {
+        _server = await ServerService.Get(ServerId);
+
+        var fb = new FormBuilder<ServerDto>();
+
+        _formModel = fb
+            .Input(x => x.Name).WithIcon("server")
+            .TextArea(x => x.Description, rows: 3)
+            .Input(x => x.AssignedRange).WithText("Assigned IP Range")
+            .Input(x => x.Dns).WithText("DNS").WithIcon("address-book")
+            .Input(x => x.Endpoint).WithIcon("globe")
+            .Input(x => x.PublicKey).WithIcon("key")
+            .WithModel(_server)
+            .Build();
+    }
+}

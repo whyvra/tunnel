@@ -1,0 +1,113 @@
+@using Microsoft.Extensions.DependencyInjection
+@using Whyvra.Tunnel.Presentation.Services
+@using Whyvra.Tunnel.Common.Models
+
+@inject IOptions<AuthenticationOptions> Auth
+@inject IServiceProvider Services
+@inject ServerService ServerService
+
+@page "/servers"
+
+<div style="padding-bottom: 1em; text-align: right;">
+    <button class="button is-success is-rounded">
+        <span class="icon">
+            <i class="fas fa-plus"></i>
+        </span>
+        <span>New server</span>
+    </button>
+</div>
+
+<div class="tile is-ancestor">
+    @foreach (var server in _servers)
+    {
+        <div class="tile is-parent is-4 serverbox" @onclick="@(() => Pop(server.Id))">
+            <article class="tile is-child box">
+                <p class="title">@server.Name</p>
+                <p class="subtitle">@server.Description</p>
+            </article>
+        </div>
+    }
+    </div>
+
+    @if (_showServerPopup && _serverId.HasValue)
+    {
+        <div class="modal is-active">
+            <div class="modal-background"></div>
+            <div class="modal-card">
+                <header class="modal-card-head">
+                    <div class="modal-card-title">
+                        <div class="level">
+                            <div class="level-left">
+                                <div class="level-item">
+                                    <span class="icon has-text-info" style="padding-right: 10px;">
+                                        <i class="fas fa-info-circle"></i>
+                                    </span>
+                                    <span>Server info</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <button class="delete" aria-label="close" @onclick="@(() => _showServerPopup = false)"></button>
+                </header>
+                <section class="modal-card-body">
+                    <ServerForm ServerId="@_serverId.Value" />
+                </section>
+                <footer class="modal-card-foot">
+                    <button class="button is-warning">
+                        <span class="icon">
+                            <i class="fas fa-pencil-alt"></i>
+                        </span>
+                        <span>Edit</span>
+                    </button>
+                    <button class="button is-danger">
+                        <span class="icon">
+                            <i class="fas fa-trash-alt"></i>
+                        </span>
+                        <span>Delete</span>
+                    </button>
+                    <button class="button" @onclick="@(() => _showServerPopup = false)">
+                        <span class="icon">
+                            <i class="fas fa-times"></i>
+                        </span>
+                        <span>Cancel</span>
+                    </button>
+                </footer>
+            </div>
+        </div>
+    }
+
+@code
+{
+    private bool _showServerPopup = false;
+    private IEnumerable<ServerDto> _servers = new ServerDto[0];
+    private int? _serverId = null;
+
+    protected override async Task OnInitializedAsync()
+    {
+        // Check if authentication is enabled
+        if (Auth.Value.Enabled)
+        {
+            var provider = Services.GetService<AuthenticationStateProvider>();
+            var state = await provider.GetAuthenticationStateAsync();
+            
+            // Only query servers if authenticated
+            if (state.User.Identity.IsAuthenticated)
+            {
+                _servers = await ServerService.GetAll();
+            }
+        }
+        else
+        {
+            _servers = await ServerService.GetAll();
+        }
+    }
+
+    private void Pop(int serverId)
+    {
+        // Set server id
+        _serverId = serverId;
+
+        // Show popup
+        _showServerPopup = true;
+    }
+}

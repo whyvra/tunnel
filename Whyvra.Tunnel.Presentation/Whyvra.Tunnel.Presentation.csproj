@@ -16,6 +16,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Whyvra.Tunnel.Common\Whyvra.Tunnel.Common.csproj" />
+    <ProjectReference Include="..\Whyvra.Blazor.Forms\Whyvra.Blazor.Forms.csproj" />
   </ItemGroup>
 
 </Project>

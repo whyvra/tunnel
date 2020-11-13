@@ -1,0 +1,95 @@
+@using Whyvra.Blazor.Forms.Infrastructure
+
+@inherits ComponentBase
+@typeparam TModel
+
+<form>
+    @foreach (var field in FormModel.Fields.Where(x => x is Input).Select(x => (Input)x))
+    {
+        @if (field is TextArea area)
+        {
+            <div class="field">
+                <label for="@(field.Name)">@(field.DisplayName)</label>
+                <div class="control">
+                    <textarea id="@(field.Name)" class="textarea has-fixed-size @(FormViewMode == FormViewMode.Readonly ? "is-static" : "")"
+                        placeholder="@(field.DisplayName)" value="@(field.PropertyInfo.GetValue(FormModel.DataModel))"
+                        @onchange="@(async (e) => await HandleChange(field, e))" readonly="@(FormViewMode == FormViewMode.Readonly)"
+                        rows="@(area.Rows.HasValue ? $"{area.Rows.Value}" : "")"
+                        columns="@(area.Columns.HasValue ? $"{area.Columns.Value}" : "")">
+                    </textarea>
+                </div>
+            </div>
+        }
+        else {
+            <div class="field">
+                <label for="@(field.Name)">@(field.DisplayName)</label>
+                <p class="control @(field.Icon != null ? "has-icons-left" : "")">
+                    <input id="@(field.Name)" class="input @(FormViewMode == FormViewMode.Readonly ? "is-static" : "")" type="text"
+                        placeholder="@(field.DisplayName)" value="@(field.PropertyInfo.GetValue(FormModel.DataModel))"
+                        @onchange="@(async (e) => await HandleChange(field, e))" readonly="@(FormViewMode == FormViewMode.Readonly)">
+                    @if (field.Icon != null)
+                    {
+                        <span class="icon is-small is-left">
+                            <i class="fas fa-@(field.Icon)"></i>
+                        </span>
+                    }
+                </p>
+            </div>
+        }
+        
+    }
+    <div class="field is-grouped">
+        @foreach (var button in FormModel.Fields.Where(x => x is Button).Select(x => (Button)x))
+        {
+            <div class="control">
+                <button class="button @(string.Join(" ", button.Classes))" @onclick:preventDefault
+                    @onclick="@(async (e) => await HandleClick(button, e))">
+                    <span class="icon">
+                        <i class="fas fa-@(button.Icon)"></i>
+                    </span>
+                    <span>@(button.Name)</span>
+                </button>
+            </div>
+        }
+    </div>
+</form>
+
+@code
+{
+
+    [Parameter]
+    public FormModel<TModel> FormModel { get; set; }
+
+    [Parameter]
+    public FormViewMode FormViewMode { get; set; }
+
+    private async Task HandleChange(Input input, ChangeEventArgs e)
+    {
+        // Update data model
+        input.PropertyInfo.SetValue(FormModel.DataModel, e.Value.ToString());
+
+        // Fire off async handlers
+        var asyncHandler = input.OnChangeAsyncHandler?.InvokeAllAsync(this, e) ?? Task.CompletedTask;
+
+        // Fire off synchronous handlers
+        var handler = input.OnChangeHandler;
+        handler?.Invoke(this, e);
+
+        // Wait for async handlers to complete
+        await asyncHandler;
+    }
+
+    private async Task HandleClick(Button button, MouseEventArgs e)
+    {
+
+        // Fire off async handlers
+        var asyncHandler = button.OnClickAsyncHandler?.InvokeAllAsync(this, e) ?? Task.CompletedTask;
+
+        // Fire off synchronous handlers
+        var handler = button.OnClickHandler;
+        handler?.Invoke(this, e);
+
+        // Wait for async handlers to complete
+        await asyncHandler;
+    }
+}

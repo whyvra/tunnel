@@ -74,3 +74,30 @@ html {
     font-size: 1.5rem;
     font-family: Consolas, Menlo, Monaco, monospace;
 }
+
+.serverbox {
+    transition: transform 0.2s ease;
+}
+
+.serverbox:hover {
+    cursor: pointer;
+    transform: scale(1.05);
+    z-index: 1;
+}
+
+.modal input.is-static {
+    color: #f2f2f2;
+    cursor: context-menu;
+}
+
+.modal textarea.is-static {
+    background-color: transparent;
+    border-color: transparent;
+    box-shadow: none;
+    color: #f2f2f2;
+    cursor: context-menu;
+}
+
+.control.has-icons-left .input.is-static:focus~.icon, .control.has-icons-right .input.is-static:focus~.icon {
+    color: #5e6d6f;
+}

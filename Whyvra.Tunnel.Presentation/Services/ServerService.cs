@@ -19,6 +19,11 @@ namespace Whyvra.Tunnel.Presentation.Services
             _api = api.Value;
         }
 
+        public async Task<ServerDto> Get(int id)
+        {
+            return await _http.GetFromJsonAsync<ServerDto>($"{_api.Url}/servers/{id}");
+        }
+
         public async Task<IEnumerable<ServerDto>> GetAll()
         {
             return await _http.GetFromJsonAsync<IEnumerable<ServerDto>>($"{_api.Url}/servers");

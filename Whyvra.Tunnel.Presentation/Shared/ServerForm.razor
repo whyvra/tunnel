@@ -16,6 +16,7 @@
 
     [Parameter]
     public int ServerId { get; set; }
+
     protected override async Task OnInitializedAsync()
     {
         _server = await ServerService.Get(ServerId);
@@ -26,6 +27,7 @@
             .Input(x => x.Name).WithIcon("server")
             .TextArea(x => x.Description, rows: 3)
             .Input(x => x.AssignedRange).WithText("Assigned IP Range")
+            .TagsInput(x => x.DefaultAllowedRange)
             .Input(x => x.Dns).WithText("DNS").WithIcon("address-book")
             .Input(x => x.Endpoint).WithIcon("globe")
             .Input(x => x.PublicKey).WithIcon("key")

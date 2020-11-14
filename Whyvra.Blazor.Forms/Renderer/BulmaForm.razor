@@ -1,3 +1,4 @@
+@using Whyvra.Blazor.Forms.Components
 @using Whyvra.Blazor.Forms.Infrastructure
 
 @inherits ComponentBase
@@ -20,6 +21,16 @@
                 </div>
             </div>
         }
+        else if (field is TagsInput tag)
+        {
+            <div class="field">
+                <label for="@(field.Name)">@(field.DisplayName)</label>
+                <p class="control">
+                    <BulmaTagsInput
+                        Data="@(field.PropertyInfo.GetValue(FormModel.DataModel) as IEnumerable<string>)" />
+                </p>
+            </div>
+        }
         else {
             <div class="field">
                 <label for="@(field.Name)">@(field.DisplayName)</label>
@@ -29,7 +40,7 @@
                         @onchange="@(async (e) => await HandleChange(field, e))" readonly="@(FormViewMode == FormViewMode.Readonly)">
                     @if (field.Icon != null)
                     {
-                        <span class="icon is-small is-left">
+                        <span class="icon is-left">
                             <i class="fas fa-@(field.Icon)"></i>
                         </span>
                     }

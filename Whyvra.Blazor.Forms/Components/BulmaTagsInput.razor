@@ -1,0 +1,18 @@
+@using Microsoft.JSInterop 
+
+@inherits ComponentBase
+
+@inject IJSRuntime _runtime
+
+<div class="tags">
+    @foreach (var tag in Data)
+    {
+        <span class="tag is-rounded is-primary">@tag</span>
+    }
+</div>
+
+@code
+{
+    [Parameter]
+    public IEnumerable<string> Data { get; set; }
+}

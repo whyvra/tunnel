@@ -117,6 +117,25 @@ namespace Whyvra.Blazor.Forms
             return this;
         }
 
+        public FormBuilder<TModel> TagsInput<TProperty>(Expression<Func<TModel, TProperty>> propertyLambda)
+        {
+            var member = propertyLambda.Body as MemberExpression;
+            var propertyInfo = member.Member as PropertyInfo;
+            var name = propertyInfo.Name;
+
+            var tags = new TagsInput
+            {
+                Name = name,
+                DisplayName = AddSpaces(name),
+                PropertyInfo = propertyInfo
+            };
+
+            _activeField = name;
+            _fields.Add(name, tags);
+
+            return this;
+        }
+
         public FormBuilder<TModel> TextArea<TProperty>(Expression<Func<TModel, TProperty>> propertyLambda, int? columns = null, int? rows = null)
         {
             var member = propertyLambda.Body as MemberExpression;

@@ -1,8 +1,6 @@
-using MediatR;
-
-namespace Whyvra.Tunnel.Common.Commands
+namespace Whyvra.Tunnel.Common.Models
 {
-    public class CreateServerCommand : IRequest<int>
+    public class CreateUpdateServerDto
     {
         public string Name { get; set; }
 

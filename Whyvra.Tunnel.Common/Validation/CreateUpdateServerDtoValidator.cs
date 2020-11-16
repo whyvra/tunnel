@@ -1,11 +1,11 @@
 using FluentValidation;
-using Whyvra.Tunnel.Common.Validation;
+using Whyvra.Tunnel.Common.Models;
 
-namespace Whyvra.Tunnel.Common.Commands
+namespace Whyvra.Tunnel.Common.Validation
 {
-    public class CreateServerCommandValidator : AbstractValidator<CreateServerCommand>
+    public class CreateUpdateServerDtoValidator : AbstractValidator<CreateUpdateServerDto>
     {
-        public CreateServerCommandValidator()
+        public CreateUpdateServerDtoValidator()
         {
             RuleFor(x => x.Name)
                 .NotNull()

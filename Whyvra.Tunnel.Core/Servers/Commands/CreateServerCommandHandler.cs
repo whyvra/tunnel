@@ -2,7 +2,6 @@ using System.Net;
 using System.Threading;
 using System.Threading.Tasks;
 using MediatR;
-using Whyvra.Tunnel.Common.Commands;
 using Whyvra.Tunnel.Data;
 using Whyvra.Tunnel.Data.Configuration;
 using Whyvra.Tunnel.Domain.Entitites;
@@ -22,12 +21,12 @@ namespace Whyvra.Tunnel.Core.Servers.Commands
         {
             var server = new WireguardServer
             {
-                Name = command.Name,
-                Description = command.Description,
-                AssignedRange = command.AssignedRange.ToAddress(),
-                Dns = IPAddress.Parse(command.Dns),
-                Endpoint = command.Endpoint,
-                PublicKey = command.PublicKey
+                Name = command.Data.Name,
+                Description = command.Data.Description,
+                AssignedRange = command.Data.AssignedRange.ToAddress(),
+                Dns = IPAddress.Parse(command.Data.Dns),
+                Endpoint = command.Data.Endpoint,
+                PublicKey = command.Data.PublicKey
             };
 
             await _context.Servers.AddAsync(server, cancellationToken);

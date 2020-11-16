@@ -12,7 +12,7 @@ using Microsoft.Extensions.Hosting;
 using Whyvra.Accounts.Api.Filters;
 using Whyvra.Tunnel.Api.Authentication;
 using Whyvra.Tunnel.Api.Configuration;
-using Whyvra.Tunnel.Common.Commands;
+using Whyvra.Tunnel.Common.Validation;
 using Whyvra.Tunnel.Core;
 using Whyvra.Tunnel.Core.Users;
 using Whyvra.Tunnel.Data;
@@ -56,7 +56,7 @@ namespace Whyvra.Tunnel.Api
                         x.Filters.Add(new AuthorizeFilter());
                     }
                 })
-                .AddFluentValidation(x => x.RegisterValidatorsFromAssemblyContaining<CreateServerCommandValidator>())
+                .AddFluentValidation(x => x.RegisterValidatorsFromAssemblyContaining<CreateUpdateServerDtoValidator>())
                 .AddJsonOptions(x =>
                 {
                     x.JsonSerializerOptions.IgnoreNullValues = true;

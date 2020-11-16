@@ -27,53 +27,11 @@
             </article>
         </div>
     }
-    </div>
+</div>
 
     @if (_showServerPopup && _serverId.HasValue)
     {
-        <div class="modal is-active">
-            <div class="modal-background"></div>
-            <div class="modal-card">
-                <header class="modal-card-head">
-                    <div class="modal-card-title">
-                        <div class="level">
-                            <div class="level-left">
-                                <div class="level-item">
-                                    <span class="icon has-text-info" style="padding-right: 10px;">
-                                        <i class="fas fa-info-circle"></i>
-                                    </span>
-                                    <span>Server info</span>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <button class="delete" aria-label="close" @onclick="@(() => _showServerPopup = false)"></button>
-                </header>
-                <section class="modal-card-body">
-                    <ServerForm ServerId="@_serverId.Value" />
-                </section>
-                <footer class="modal-card-foot">
-                    <button class="button is-warning">
-                        <span class="icon">
-                            <i class="fas fa-pencil-alt"></i>
-                        </span>
-                        <span>Edit</span>
-                    </button>
-                    <button class="button is-danger">
-                        <span class="icon">
-                            <i class="fas fa-trash-alt"></i>
-                        </span>
-                        <span>Delete</span>
-                    </button>
-                    <button class="button" @onclick="@(() => _showServerPopup = false)">
-                        <span class="icon">
-                            <i class="fas fa-times"></i>
-                        </span>
-                        <span>Cancel</span>
-                    </button>
-                </footer>
-            </div>
-        </div>
+        <ServerForm ServerId="@_serverId.Value" CloseAction="@(() => _showServerPopup = false)" />
     }
 
 @code

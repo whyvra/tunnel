@@ -168,6 +168,17 @@ namespace Whyvra.Blazor.Forms
             return this;
         }
 
+        public FormBuilder<TModel> WithDefaultEmptyValue(string empty)
+        {
+            var field = _fields[_activeField];
+            if (field is TagsInput tag)
+            {
+                tag.EmptyValue = empty;
+            }
+
+            return this;
+        }
+
         public FormBuilder<TModel> WithIcon(string icon)
         {
             var field = _fields[_activeField];

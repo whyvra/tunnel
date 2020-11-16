@@ -4,15 +4,39 @@
 
 @inject IJSRuntime _runtime
 
-<div class="tags">
-    @foreach (var tag in Data)
-    {
-        <span class="tag is-rounded is-primary">@tag</span>
-    }
-</div>
+@if (IsReadOnly)
+{
+    <div class="tags">
+        @foreach (var tag in Data)
+        {
+            <span class="tag is-rounded is-primary">@tag</span>
+        }
+        @if (!Data.Any())
+        {
+            <span class="tag is-rounded is-primary">@EmptyValue</span>
+        }
+    </div>
+}
+
 
 @code
 {
+    private bool _isReadonly;
+    private bool _previousReadonly;
+
     [Parameter]
     public IEnumerable<string> Data { get; set; }
+
+    [Parameter]
+    public string EmptyValue { get; set; }
+
+    [Parameter]
+    public bool IsReadOnly
+    {
+        get { return _isReadonly; }
+        set { _previousReadonly = _isReadonly; _isReadonly = value; }
+    }
+
+    [Parameter]
+    public string Placeholder { get; set; }
 }

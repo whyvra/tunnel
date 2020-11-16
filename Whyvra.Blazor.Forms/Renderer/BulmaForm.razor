@@ -27,7 +27,10 @@
                 <label for="@(field.Name)">@(field.DisplayName)</label>
                 <p class="control">
                     <BulmaTagsInput
-                        Data="@(field.PropertyInfo.GetValue(FormModel.DataModel) as IEnumerable<string>)" />
+                        Data="@(field.PropertyInfo.GetValue(FormModel.DataModel) as IEnumerable<string>)"
+                        EmptyValue="@tag.EmptyValue"
+                        IsReadOnly="@(FormViewMode == FormViewMode.Readonly)"
+                        Placeholder="@(tag.DisplayName)" />
                 </p>
             </div>
         }

@@ -28,12 +28,24 @@
                 <BulmaForm FormModel="_formModel" FormViewMode="@_formMode"></BulmaForm>
             </section>
             <footer class="modal-card-foot">
-                <button class="button is-warning">
-                    <span class="icon">
-                        <i class="fas fa-pencil-alt"></i>
-                    </span>
-                    <span>Edit</span>
-                </button>
+                @if (_formMode == FormViewMode.Readonly)
+                {
+                    <button class="button is-warning" @onclick="@(() => _formMode = FormViewMode.Edit)">
+                        <span class="icon">
+                            <i class="fas fa-pencil-alt"></i>
+                        </span>
+                        <span>Edit</span>
+                    </button>
+                }
+                @if (_formMode != FormViewMode.Readonly)
+                {
+                    <button class="button is-primary">
+                        <span class="icon">
+                            <i class="fas fa-save"></i>
+                        </span>
+                        <span>Save changes</span>
+                    </button>
+                }
                 <button class="button is-danger">
                     <span class="icon">
                         <i class="fas fa-trash-alt"></i>

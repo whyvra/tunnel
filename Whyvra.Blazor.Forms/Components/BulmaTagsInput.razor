@@ -1,8 +1,4 @@
-@using Microsoft.JSInterop 
-
 @inherits ComponentBase
-
-@inject IJSRuntime _runtime
 
 @if (IsReadOnly)
 {
@@ -17,26 +13,60 @@
         }
     </div>
 }
-
+else
+{
+    <div class="tags-input">
+        @foreach (var tag in Data)
+        {
+            <span class="tag is-rounded is-primary">
+                @tag
+                <button class="delete" @onclick:preventDefault></button>
+            </span>
+        }
+        <input class="input" type="text" placeholder="@Placeholder" value=@_value @oninput="Process">
+    </div>
+    
+}
 
 @code
 {
-    private bool _isReadonly;
-    private bool _previousReadonly;
+    private string _value = null;
 
     [Parameter]
     public IEnumerable<string> Data { get; set; }
 
     [Parameter]
+    public EventCallback<IEnumerable<string>> DataChanged { get; set; }
+
+    [Parameter]
     public string EmptyValue { get; set; }
 
     [Parameter]
-    public bool IsReadOnly
-    {
-        get { return _isReadonly; }
-        set { _previousReadonly = _isReadonly; _isReadonly = value; }
-    }
+    public bool IsReadOnly { get; set; }
 
     [Parameter]
     public string Placeholder { get; set; }
+
+    private async Task Process(ChangeEventArgs e)
+    {
+        // Get typed text
+        var text = e.Value.ToString();
+        if (string.IsNullOrWhiteSpace(text)) return;
+
+        var lastChar = text[text.Length - 1];
+
+        if (lastChar == ',')
+        {
+            // Add new tag to list
+            var data = Data.ToList();
+            data.Add(text.Substring(0, text.Length - 1));
+
+            // Empty text field
+            _value = string.Empty;
+
+            // Update the public list and trigger callback
+            Data = data;
+            await DataChanged.InvokeAsync(Data);
+        }
+    }
 }

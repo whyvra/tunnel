@@ -101,3 +101,43 @@ html {
 .control.has-icons-left .input.is-static:focus~.icon, .control.has-icons-right .input.is-static:focus~.icon {
     color: #5e6d6f;
 }
+
+.tags-input {
+    align-content: flex-start;
+    display: flex;
+    flex-wrap: wrap;
+    height: auto;
+    min-height: 2.5em;
+    padding: 0;
+    position: relative;
+    background-color: #fff;
+    border-color: #dbdbdb;
+    border-radius: 4px;
+    color: #363636;
+    align-items: center;
+    border: 1px solid transparent;
+    box-shadow: none;
+    font-size: 1rem;
+    justify-content: flex-start;
+    line-height: 1.5;
+    vertical-align: top;
+}
+
+.tags-input .input {
+    border-color: transparent;
+    box-shadow: none;
+    display: inline-block;
+    flex: 1 0 auto;
+    height: 2.3rem;
+    margin: .1rem;
+    width: auto;
+}
+
+.tags-input .tag {
+    font-size: 1rem;
+    margin: .1rem;
+}
+
+.tags-input .tag:hover {
+    cursor: pointer;
+}

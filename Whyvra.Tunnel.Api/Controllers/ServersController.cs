@@ -99,6 +99,5 @@ namespace Whyvra.Tunnel.Api.Controllers
 
             return NoContent();
         }
-
     }
 }

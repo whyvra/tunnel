@@ -68,5 +68,37 @@ namespace Whyvra.Tunnel.Api.Controllers
 
             return NoContent();
         }
+
+        /// <summary>
+        /// Add a network address to a WireGuard server's default allowed range
+        /// </summary>
+        /// <response code="201">Created</response>
+        [HttpPut("{id}/allowedrange/{networkAddressId}")]
+        [ProducesResponseType(201)]
+        public async Task<IActionResult> Put(int id, int networkAddressId, CancellationToken cancellationToken)
+        {
+            var command = new AddAddressToServerCommand {NetworkAddressId = networkAddressId, ServerId = id};
+            var result = await Mediator.Send(command, cancellationToken);
+
+            return new JsonResult(new {id = result})
+            {
+                StatusCode = 201
+            };
+        }
+
+        /// <summary>
+        /// Remove a network address from a WireGuard server's default allowed range
+        /// </summary>
+        /// <response code="204">NoContent</response>
+        [HttpDelete("{id}/allowedrange/{networkAddressId}")]
+        [ProducesResponseType(204)]
+        public async Task<IActionResult> Delete(int id, int networkAddressId, CancellationToken cancellationToken)
+        {
+            var command = new RemoveAddressFromServerCommand {NetworkAddressId = networkAddressId, ServerId = id};
+            await Mediator.Send(command, cancellationToken);
+
+            return NoContent();
+        }
+
     }
 }

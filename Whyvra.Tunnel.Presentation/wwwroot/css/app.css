@@ -141,3 +141,12 @@ html {
 .tags-input .tag:hover {
     cursor: pointer;
 }
+
+.modal-loader {
+    text-align: center;
+}
+
+.modal-loader .button.is-loading {
+    background: transparent;
+    border: none;
+}

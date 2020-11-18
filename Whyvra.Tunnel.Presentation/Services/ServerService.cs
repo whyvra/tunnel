@@ -19,6 +19,12 @@ namespace Whyvra.Tunnel.Presentation.Services
             _api = api.Value;
         }
 
+        public async Task AddToAllowedRange(int id, int networkAddressId)
+        {
+            var result = await _http.PutAsync($"{_api.Url}/servers/{id}/allowedrange/{networkAddressId}", null);
+            result.EnsureSuccessStatusCode();
+        }
+
         public async Task<ServerDto> Get(int id)
         {
             return await _http.GetFromJsonAsync<ServerDto>($"{_api.Url}/servers/{id}");
@@ -27,6 +33,17 @@ namespace Whyvra.Tunnel.Presentation.Services
         public async Task<IEnumerable<ServerDto>> GetAll()
         {
             return await _http.GetFromJsonAsync<IEnumerable<ServerDto>>($"{_api.Url}/servers");
+        }
+
+        public async Task RemoveFromAllowedRange(int id, int networkAddressId)
+        {
+            var result = await _http.DeleteAsync($"{_api.Url}/servers/{id}/allowedrange/{networkAddressId}");
+            result.EnsureSuccessStatusCode();
+        }
+        public async Task Update(int id, CreateUpdateServerDto server)
+        {
+            var result = await _http.PutAsJsonAsync($"{_api.Url}/servers/{id}", server);
+            result.EnsureSuccessStatusCode();
         }
     }
 }

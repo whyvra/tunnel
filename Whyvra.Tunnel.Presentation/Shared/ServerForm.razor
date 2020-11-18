@@ -1,10 +1,15 @@
 @using Whyvra.Blazor.Forms.Renderer
-@using Whyvra.Tunnel.Common.Models
-@using Whyvra.Tunnel.Presentation.Services
 
-@inject ServerService ServerService
-
-@if (_server != null)
+@if (IsLoading)
+{
+    <div class="modal is-active">
+        <div class="modal-background"></div>
+        <div class="modal-content modal-loader">
+            <button class="button is-loading is-large"></button>
+        </div>
+    </div>
+} 
+else if (_server != null)
 {
     <div class="modal is-active">
         <div class="modal-background"></div>
@@ -22,24 +27,24 @@
                         </div>
                     </div>
                 </div>
-                <button class="delete" aria-label="close" @onclick="DoCloseAction"></button>
+                <button class="delete" aria-label="close" @onclick="InvokeClose"></button>
             </header>
             <section class="modal-card-body">
-                <BulmaForm FormModel="_formModel" FormViewMode="@_formMode"></BulmaForm>
+                <BulmaForm FormModel="@FormModel" FormViewMode="@FormViewMode"></BulmaForm>
             </section>
             <footer class="modal-card-foot">
-                @if (_formMode == FormViewMode.Readonly)
+                @if (FormViewMode == FormViewMode.Readonly)
                 {
-                    <button class="button is-warning" @onclick="@(() => _formMode = FormViewMode.Edit)">
+                    <button class="button is-warning" @onclick="@(() => FormViewMode = FormViewMode.Edit)">
                         <span class="icon">
                             <i class="fas fa-pencil-alt"></i>
                         </span>
                         <span>Edit</span>
                     </button>
                 }
-                @if (_formMode != FormViewMode.Readonly)
+                @if (FormViewMode != FormViewMode.Readonly)
                 {
-                    <button class="button is-primary">
+                    <button class="button is-primary" @onclick="SaveChanges">
                         <span class="icon">
                             <i class="fas fa-save"></i>
                         </span>
@@ -52,7 +57,7 @@
                     </span>
                     <span>Delete</span>
                 </button>
-                <button class="button" @onclick="DoCloseAction">
+                <button class="button" @onclick="InvokeClose">
                     <span class="icon">
                         <i class="fas fa-times"></i>
                     </span>
@@ -65,36 +70,8 @@
 
 @code
 {
-    private FormViewMode _formMode = FormViewMode.Readonly;
-    private FormModel<ServerDto> _formModel;
-    private ServerDto _server;
-
-    [Parameter]
-    public int ServerId { get; set; }
-
-    [Parameter]
-    public EventCallback CloseAction { get; set; }
-
-    protected override async Task OnInitializedAsync()
+    private async Task InvokeClose()
     {
-        _server = await ServerService.Get(ServerId);
-
-        var fb = new FormBuilder<ServerDto>();
-
-        _formModel = fb
-            .Input(x => x.Name).WithIcon("server")
-            .TextArea(x => x.Description, rows: 3)
-            .Input(x => x.AssignedRange).WithText("Assigned IP Range").WithIcon("network-wired")
-            .TagsInput(x => x.DefaultAllowedRange).WithDefaultEmptyValue("No IP range has been assigned")
-            .Input(x => x.Dns).WithText("DNS").WithIcon("address-book")
-            .Input(x => x.Endpoint).WithIcon("globe")
-            .Input(x => x.PublicKey).WithIcon("key")
-            .WithModel(_server)
-            .Build();
-    }
-
-    private async Task DoCloseAction()
-    {
-        await CloseAction.InvokeAsync(null);
+        await CloseAction.InvokeAsync(false);
     }
 }

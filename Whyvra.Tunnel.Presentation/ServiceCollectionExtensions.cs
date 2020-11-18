@@ -1,10 +1,14 @@
 using System;
+using FluentValidation;
 using Microsoft.AspNetCore.Components.WebAssembly.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Whyvra.Tunnel.Common.Models;
+using Whyvra.Tunnel.Common.Validation;
 using Whyvra.Tunnel.Presentation.Authentication;
 using Whyvra.Tunnel.Presentation.Configuration;
 using Whyvra.Tunnel.Presentation.Services;
+using Whyvra.Tunnel.Presentation.ViewModels;
 
 namespace Whyvra.Tunnel.Presentation
 {
@@ -42,8 +46,14 @@ namespace Whyvra.Tunnel.Presentation
 
             // Register services
             builder.Services
+                .AddScoped<NetworkAddressService>()
                 .AddScoped<ServerService>()
                 .AddScoped<UserService>();
+
+            // Register validators
+            builder.Services
+                .AddScoped<IValidator<CreateUpdateServerDto>, CreateUpdateServerDtoValidator>()
+                .AddScoped<IValidator<ServerViewModel>, ServerViewModelValidator>();
 
             return services;
         }

@@ -31,7 +31,7 @@
 
     @if (_showServerPopup && _serverId.HasValue)
     {
-        <ServerForm ServerId="@_serverId.Value" CloseAction="@(() => _showServerPopup = false)" />
+        <ServerForm ServerId="@_serverId.Value" CloseAction="ClosePopup" />
     }
 
 @code
@@ -67,5 +67,11 @@
 
         // Show popup
         _showServerPopup = true;
+    }
+
+    private async Task ClosePopup(bool updated)
+    {
+        if (updated) _servers = await ServerService.GetAll();
+        _showServerPopup = false;
     }
 }

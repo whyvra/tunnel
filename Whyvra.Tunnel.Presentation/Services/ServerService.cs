@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Net.Http;
 using System.Net.Http.Json;
@@ -22,6 +23,21 @@ namespace Whyvra.Tunnel.Presentation.Services
         public async Task AddToAllowedRange(int id, int networkAddressId)
         {
             var result = await _http.PutAsync($"{_api.Url}/servers/{id}/allowedrange/{networkAddressId}", null);
+            result.EnsureSuccessStatusCode();
+        }
+
+        public async Task<int> CreateNew(CreateUpdateServerDto server)
+        {
+            var result = await _http.PostAsJsonAsync($"{_api.Url}/servers", server);
+            result.EnsureSuccessStatusCode();
+
+            var response = await result.Content.ReadFromJsonAsync<IdResponse>();
+            return response.Id;
+        }
+
+        public async Task Delete(int id)
+        {
+            var result = await _http.DeleteAsync($"{_api.Url}/servers/{id}");
             result.EnsureSuccessStatusCode();
         }
 

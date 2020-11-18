@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using System.Linq;
 using System.Text.Json;
 using System.Threading.Tasks;
@@ -21,6 +22,7 @@ namespace Whyvra.Tunnel.Presentation.Shared
         public FormModel<ServerViewModel> FormModel { get; set; }
         public FormViewMode FormViewMode { get; set; } = FormViewMode.Readonly;
         public bool IsLoading { get; set; }
+        public bool ShowDeleteConfirm { get; set; }
 
         // Injectable properties
         [Inject]
@@ -34,45 +36,54 @@ namespace Whyvra.Tunnel.Presentation.Shared
 
         // Razor component parameters
         [Parameter]
-        public int ServerId { get; set; }
+        public int? ServerId { get; set; }
 
         [Parameter]
         public EventCallback<bool> CloseAction { get; set; }
 
         protected override async Task OnInitializedAsync()
         {
-            // Query backend 
-            _server = await ServerService.Get(ServerId);
-            // Store a copy for dirty checks
-            _copy = JsonSerializer.Serialize(_server);
-
-            // Instantiate our view model
-            var viewModel = new ServerViewModel
-            {
-                Server = new CreateUpdateServerDto
-                {
-                    Name = _server.Name,
-                    Description = _server.Description,
-                    AssignedRange = _server.AssignedRange,
-                    Dns = _server.Dns,
-                    Endpoint = _server.Endpoint,
-                    PublicKey = _server.PublicKey
-                },
-                DefaultAllowedRange = _server.DefaultAllowedRange
-            };
-
             var fb = new FormBuilder<ServerViewModel>();
 
-            FormModel = fb
+            fb
                 .Input(x => x.Server.Name).WithIcon("server")
                 .TextArea(x => x.Server.Description, rows: 3)
                 .Input(x => x.Server.AssignedRange).WithText("Assigned IP Range").WithIcon("network-wired")
                 .TagsInput(x => x.DefaultAllowedRange).WithDefaultEmptyValue("No IP range has been assigned")
                 .Input(x => x.Server.Dns).WithText("DNS").WithIcon("address-book")
                 .Input(x => x.Server.Endpoint).WithIcon("globe")
-                .Input(x => x.Server.PublicKey).WithIcon("key")
-                .WithModel(viewModel)
-                .Build();
+                .Input(x => x.Server.PublicKey).WithIcon("key");
+
+            if (ServerId.HasValue)
+            {
+                // Query backend 
+                _server = await ServerService.Get(ServerId.Value);
+                // Store a copy for dirty checks
+                _copy = JsonSerializer.Serialize(_server);
+
+                // Instantiate our view model
+                var viewModel = new ServerViewModel
+                {
+                    Server = new CreateUpdateServerDto
+                    {
+                        Name = _server.Name,
+                        Description = _server.Description,
+                        AssignedRange = _server.AssignedRange,
+                        Dns = _server.Dns,
+                        Endpoint = _server.Endpoint,
+                        PublicKey = _server.PublicKey
+                    },
+                    DefaultAllowedRange = _server.DefaultAllowedRange
+                };
+
+                fb.WithModel(viewModel);
+            }
+            else
+            {
+                FormViewMode = FormViewMode.Blank;
+            }
+
+            FormModel = fb.Build();
         }
 
         protected async Task SaveChanges()
@@ -86,16 +97,26 @@ namespace Whyvra.Tunnel.Presentation.Shared
                 // Start loading screen
                 IsLoading = true;
                 _server = null;
+                var wasUpdated = false;
 
-                var wasUpdated = await Update(model);
+                if (FormViewMode == FormViewMode.Edit && ServerId.HasValue)
+                {
+                    wasUpdated = await Update(model, ServerId.Value);
+                }
+                else if (FormViewMode == FormViewMode.Blank)
+                {
+                    var id = await ServerService.CreateNew(model.Server);
+                    wasUpdated = true;
+                    await ProcessNetWorkAddresses(id, model.DefaultAllowedRange, Enumerable.Empty<string>());
+                }
 
-                // Stop loading and trigger modal close
-                IsLoading = false;
+                // Trigger modal close
+                //IsLoading = false;
                 await CloseAction.InvokeAsync(wasUpdated);
             }
         }
 
-        private async Task<bool> Update(ServerViewModel viewModel)
+        private async Task<bool> Update(ServerViewModel viewModel, int serverId)
         {
             // Load stored copy for dirty check
             var original = JsonSerializer.Deserialize<ServerDto>(_copy);
@@ -104,23 +125,23 @@ namespace Whyvra.Tunnel.Presentation.Shared
             if(IsDirty(viewModel.Server, original))
             {
                 // Update record if properties have changed
-                await ServerService.Update(ServerId, viewModel.Server);
+                await ServerService.Update(serverId, viewModel.Server);
                 wasUpdated = true;
             }
 
             // Process network address in DefaultAllowedRange
-            await ProcessNetWorkAddresses(viewModel, original);
+            await ProcessNetWorkAddresses(serverId, viewModel.DefaultAllowedRange, original.DefaultAllowedRange);
 
             return wasUpdated;
         }
 
-        private async Task ProcessNetWorkAddresses(ServerViewModel viewModel, ServerDto original)
+        private async Task ProcessNetWorkAddresses(int serverId, IEnumerable<string> newRange, IEnumerable<string> oldRange)
         {
-            if (!viewModel.DefaultAllowedRange.SequenceEqual(original.DefaultAllowedRange))
+            if (!newRange.SequenceEqual(oldRange))
             {
                 // Figure out what needs to be added or removed
-                var toAdd = viewModel.DefaultAllowedRange.Except(original.DefaultAllowedRange);
-                var toRemove = original.DefaultAllowedRange.Except(viewModel.DefaultAllowedRange);
+                var toAdd = newRange.Except(oldRange);
+                var toRemove = oldRange.Except(newRange);
 
                 // Get all existing network addresses
                 var addresses = await NetworkAddressService.GetAll();
@@ -132,14 +153,14 @@ namespace Whyvra.Tunnel.Presentation.Shared
                     {
                         // Address already exists so get it's ID and just add it
                         var netId = addresses.Single(x => x.Address.Equals(addr)).Id;
-                        await ServerService.AddToAllowedRange(ServerId, netId);
+                        await ServerService.AddToAllowedRange(serverId, netId);
                     }
                     else
                     {
                         // Address doesn't exist so create it first and then add it
                         var command = new CreateNetworkAddressCommand { Address = addr };
                         var id = await NetworkAddressService.CreateNew(command);
-                        await ServerService.AddToAllowedRange(ServerId, id);
+                        await ServerService.AddToAllowedRange(serverId, id);
                     }
                 }
 
@@ -147,9 +168,22 @@ namespace Whyvra.Tunnel.Presentation.Shared
                 foreach (var addr in toRemove)
                 {
                     var netId = addresses.Single(x => x.Address.Equals(addr)).Id;
-                    await ServerService.RemoveFromAllowedRange(ServerId, netId);
+                    await ServerService.RemoveFromAllowedRange(serverId, netId);
                 }
             }
+        }
+
+        private async Task ProcessDelete()
+        {
+            IsLoading = true;
+            ShowDeleteConfirm = false;
+
+            if (ServerId.HasValue)
+            {
+                await ServerService.Delete(ServerId.Value);
+            }
+
+            await CloseAction.InvokeAsync(true);
         }
 
         private bool IsDirty(CreateUpdateServerDto server, ServerDto original)

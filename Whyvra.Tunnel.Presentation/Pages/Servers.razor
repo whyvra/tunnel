@@ -9,7 +9,7 @@
 @page "/servers"
 
 <div style="padding-bottom: 1em; text-align: right;">
-    <button class="button is-success is-rounded">
+    <button class="button is-success is-rounded" @onclick="@(() => { _serverId = null; _showServerPopup = true; })">
         <span class="icon">
             <i class="fas fa-plus"></i>
         </span>
@@ -29,9 +29,9 @@
     }
 </div>
 
-    @if (_showServerPopup && _serverId.HasValue)
+    @if (_showServerPopup)
     {
-        <ServerForm ServerId="@_serverId.Value" CloseAction="ClosePopup" />
+        <ServerForm ServerId="@_serverId" CloseAction="ClosePopup" />
     }
 
 @code

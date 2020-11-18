@@ -9,17 +9,22 @@ namespace Whyvra.Tunnel.Common.Validation
     {
         public static bool IsAllDigits(this string str)
         {
+            if(string.IsNullOrWhiteSpace(str)) return false;
+
             return Regex.IsMatch(str, @"^\d+$");
         }
 
         public static bool IsBase64(this string encoded)
         {
+            if(string.IsNullOrWhiteSpace(encoded)) return false;
+
             return encoded.Length % 4 == 0
                 && Regex.IsMatch(encoded, @"^[a-zA-Z0-9\+/]*={0,3}$", RegexOptions.None);
         }
 
         public static bool IsIPAddressWithCidr(this string addr)
         {
+            if(string.IsNullOrWhiteSpace(addr)) return false;
             var chunks = addr.Split('/');
 
                 return chunks.Length == 2
@@ -31,6 +36,7 @@ namespace Whyvra.Tunnel.Common.Validation
 
         public static bool IsIPv4Address(this string addr)
         {
+            if(string.IsNullOrWhiteSpace(addr)) return false;
             var chunks = addr.Split('.');
 
             return chunks.Length == 4

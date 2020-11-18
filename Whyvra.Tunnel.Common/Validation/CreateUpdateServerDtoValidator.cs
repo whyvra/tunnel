@@ -16,15 +16,23 @@ namespace Whyvra.Tunnel.Common.Validation
                 .MaximumLength(128);
 
             RuleFor(x => x.AssignedRange)
+                .NotNull()
+                .NotEmpty()
                 .Must(x => x.IsIPAddressWithCidr())
                 .WithMessage("{PropertyName} must be a valid IPv4 or IPv6 address in CIDR notation.");
 
             RuleFor(x => x.Dns)
+                .NotNull()
+                .NotEmpty()
                 .Must(x => x.IsIPv4Address() || x.IsIPv6Address())
                 .WithMessage("{PropertyName} must be a valid IP Address.");
 
             RuleFor(x => x.Endpoint)
+                .NotNull()
+                .NotEmpty()
                 .Must(x => {
+                    if (string.IsNullOrWhiteSpace(x)) return false;
+
                     var chunks = x.Split(':');
                     return chunks.Length == 2
                         && chunks[0].IsIPv4Address()

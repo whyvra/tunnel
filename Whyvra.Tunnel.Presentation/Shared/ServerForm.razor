@@ -9,8 +9,48 @@
         </div>
     </div>
 } 
-else if (_server != null)
+else if (FormModel != null)
 {
+    @if(ShowDeleteConfirm)
+    {
+        <div class="modal is-active" style="z-index: 45;">
+            <div class="modal-background"></div>
+            <div class="modal-content">
+                <div class="card" style="padding: 1.2em;">
+                    <div class="level">
+                        <div class="level-left">
+                            <div class="level-item is-size-4">
+                                <span class="icon has-text-danger" style="padding-right: 10px;">
+                                    <i class="fas fa-trash-alt"></i>
+                                </span>
+                                <span>Confirm deletion</span>
+                            </div>
+                        </div>
+                        <div class="level-right">
+                            <button class="delete" aria-label="close" @onclick="@(() => ShowDeleteConfirm = false)"></button>
+                        </div>
+                    </div>
+                    <p>
+                        Are you sure you want to delete server @FormModel.DataModel.Server.Name ?
+                        All it's data along with its clients configuration will be lost!</p>
+                    <div class="buttons" style="padding-top: 1.2em;">
+                        <button class="button is-success" @onclick="ProcessDelete">
+                            <span class="icon">
+                                <i class="fas fa-check"></i>
+                            </span>
+                            <span>Yes</span>
+                        </button>
+                        <button class="button is-danger" @onclick="@(() => ShowDeleteConfirm = false)">
+                            <span class="icon">
+                                <i class="fas fa-times"></i>
+                            </span>
+                            <span>No</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    }
     <div class="modal is-active">
         <div class="modal-background"></div>
         <div class="modal-card">
@@ -51,7 +91,7 @@ else if (_server != null)
                         <span>Save changes</span>
                     </button>
                 }
-                <button class="button is-danger">
+                <button class="button is-danger" @onclick="@(() => ShowDeleteConfirm = true)">
                     <span class="icon">
                         <i class="fas fa-trash-alt"></i>
                     </span>

@@ -56,7 +56,7 @@ namespace Whyvra.Tunnel.Api.Controllers
         }
 
         /// <summary>
-        /// Update an existing new WireGuard server
+        /// Update a WireGuard server
         /// </summary>
         /// <response code="204">NoContent</response>
         [HttpPut("{id}")]
@@ -64,6 +64,20 @@ namespace Whyvra.Tunnel.Api.Controllers
         public async Task<IActionResult> Put(int id, [FromBody] CreateUpdateServerDto server, CancellationToken cancellationToken)
         {
             var command = new UpdateServerCommand {Id = id, Data = server};
+            await Mediator.Send(command, cancellationToken);
+
+            return NoContent();
+        }
+
+        /// <summary>
+        /// Delete a WireGuard server
+        /// </summary>
+        /// <response code="204">NoContent</response>
+        [HttpDelete("{id}")]
+        [ProducesResponseType(204)]
+        public async Task<IActionResult> Delete(int id, CancellationToken cancellationToken)
+        {
+            var command = new DeleteServerCommand {Id = id};
             await Mediator.Send(command, cancellationToken);
 
             return NoContent();

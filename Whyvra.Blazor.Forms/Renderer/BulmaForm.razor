@@ -1,8 +1,9 @@
-@using Whyvra.Blazor.Forms.Components
-@using Whyvra.Blazor.Forms.Infrastructure
+@using Microsoft.Extensions.DependencyInjection
 
 @inherits ComponentBase
 @typeparam TModel
+
+@inject IServiceProvider services
 
 <form>
     @foreach (var field in FormModel.Fields.Where(x => x is Input).Select(x => (Input)x))
@@ -13,11 +14,16 @@
                 <label for="@(field.Name)">@(field.DisplayName)</label>
                 <div class="control">
                     <textarea id="@(field.Name)" class="textarea has-fixed-size @(FormViewMode == FormViewMode.Readonly ? "is-static" : "")"
-                        placeholder="@(field.DisplayName)" value="@(field.PropertyInfo.GetValue(FormModel.DataModel))"
+                        placeholder="@(field.DisplayName)" value="@(field.Getter(FormModel.DataModel))"
                         @onchange="@(async (e) => await HandleChange(field, e))" readonly="@(FormViewMode == FormViewMode.Readonly)"
                         rows="@(area.Rows.HasValue ? $"{area.Rows.Value}" : "")"
-                        columns="@(area.Columns.HasValue ? $"{area.Columns.Value}" : "")">
+                        columns="@(area.Columns.HasValue ? $"{area.Columns.Value}" : "")"
+                        @onfocusout="@(() => TriggerValidation(field))">
                     </textarea>
+                    @if (_isValidationEnabled)
+                    {
+                        <ValidationMessage Messages="@field.ValidationMessages" />
+                    }
                 </div>
             </div>
         }
@@ -25,14 +31,18 @@
         {
             <div class="field">
                 <label for="@(field.Name)">@(field.DisplayName)</label>
-                <p class="control">
+                <div class="control" @onfocusout="@(() => TriggerValidation(field))">
                     <BulmaTagsInput
-                        Data="@(field.PropertyInfo.GetValue(FormModel.DataModel) as IEnumerable<string>)"
+                        Data="@(field.Getter(FormModel.DataModel) as IEnumerable<string>)"
                         EmptyValue="@tag.EmptyValue"
                         IsReadOnly="@(FormViewMode == FormViewMode.Readonly)"
                         Placeholder="@(tag.DisplayName)"
-                        DataChanged="@((tags) => tag.PropertyInfo.SetValue(FormModel.DataModel, tags))" />
-                </p>
+                        DataChanged="@((tags) => tag.Setter(FormModel.DataModel, tags))" />
+                    @if (_isValidationEnabled)
+                    {
+                        <ValidationMessage Messages="@field.ValidationMessages" />
+                    }
+                </div>
             </div>
         }
         else {
@@ -40,13 +50,18 @@
                 <label for="@(field.Name)">@(field.DisplayName)</label>
                 <p class="control @(field.Icon != null ? "has-icons-left" : "")">
                     <input id="@(field.Name)" class="input @(FormViewMode == FormViewMode.Readonly ? "is-static" : "")" type="text"
-                        placeholder="@(field.DisplayName)" value="@(field.PropertyInfo.GetValue(FormModel.DataModel))"
-                        @onchange="@(async (e) => await HandleChange(field, e))" readonly="@(FormViewMode == FormViewMode.Readonly)">
+                        placeholder="@(field.DisplayName)" value="@(field.Getter(FormModel.DataModel))"
+                        @onchange="@(async (e) => await HandleChange(field, e))" readonly="@(FormViewMode == FormViewMode.Readonly)"
+                        @onfocusout="@(() => TriggerValidation(field))" >
                     @if (field.Icon != null)
                     {
                         <span class="icon is-left">
                             <i class="fas fa-@(field.Icon)"></i>
                         </span>
+                    }
+                    @if (_isValidationEnabled)
+                    {
+                        <ValidationMessage Messages="@field.ValidationMessages" />
                     }
                 </p>
             </div>
@@ -71,6 +86,8 @@
 
 @code
 {
+    private IValidator<TModel> _validator;
+    private bool _isValidationEnabled;
 
     [Parameter]
     public FormModel<TModel> FormModel { get; set; }
@@ -78,10 +95,16 @@
     [Parameter]
     public FormViewMode FormViewMode { get; set; }
 
+    protected override void OnInitialized()
+    {
+        _validator = services.GetService<IValidator<TModel>>();
+        _isValidationEnabled = !(_validator == null);
+    }
+
     private async Task HandleChange(Input input, ChangeEventArgs e)
     {
         // Update data model
-        input.PropertyInfo.SetValue(FormModel.DataModel, e.Value.ToString());
+        input.Setter(FormModel.DataModel, e.Value.ToString());
 
         // Fire off async handlers
         var asyncHandler = input.OnChangeAsyncHandler?.InvokeAllAsync(this, e) ?? Task.CompletedTask;
@@ -96,7 +119,6 @@
 
     private async Task HandleClick(Button button, MouseEventArgs e)
     {
-
         // Fire off async handlers
         var asyncHandler = button.OnClickAsyncHandler?.InvokeAllAsync(this, e) ?? Task.CompletedTask;
 
@@ -106,5 +128,17 @@
 
         // Wait for async handlers to complete
         await asyncHandler;
+    }
+
+    private void TriggerValidation(Input field)
+    {
+        if (_isValidationEnabled)
+        {
+            var result = _validator.Validate(FormModel.DataModel);
+
+            field.ValidationMessages = result.Errors
+                .Where(x => x.PropertyName.Equals(field.ValidationPath))
+                .Select(x => x.ErrorMessage);
+        }
     }
 }

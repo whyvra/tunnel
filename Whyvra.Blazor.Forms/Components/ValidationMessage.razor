@@ -1,0 +1,12 @@
+@inherits ComponentBase
+
+@if (Messages.Any())
+{
+    <p class="help is-danger">@Messages.First()</p>
+}
+
+@code
+{
+    [Parameter]
+    public IEnumerable<string> Messages { get; set;}
+}

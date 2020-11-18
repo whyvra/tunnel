@@ -20,10 +20,10 @@ else
         {
             <span class="tag is-rounded is-primary">
                 @tag
-                <button class="delete" @onclick:preventDefault></button>
+                <button class="delete" @onclick:preventDefault @onclick="@(() => RemoveTag(tag))"></button>
             </span>
         }
-        <input class="input" type="text" placeholder="@Placeholder" value=@_value @oninput="Process">
+        <input class="input" type="text" placeholder="@Placeholder" value=@_value @oninput="@(async e => { _value = e.Value.ToString(); await Process(); })">
     </div>
     
 }
@@ -47,10 +47,10 @@ else
     [Parameter]
     public string Placeholder { get; set; }
 
-    private async Task Process(ChangeEventArgs e)
+    private async Task Process()
     {
         // Get typed text
-        var text = e.Value.ToString();
+        var text = _value;
         if (string.IsNullOrWhiteSpace(text)) return;
 
         var lastChar = text[text.Length - 1];
@@ -65,8 +65,13 @@ else
             _value = string.Empty;
 
             // Update the public list and trigger callback
-            Data = data;
-            await DataChanged.InvokeAsync(Data);
+            await DataChanged.InvokeAsync(data);
         }
+    }
+
+    private async Task RemoveTag(string tag)
+    {
+        var data = Data.Where(x => !x.Equals(tag));
+        await DataChanged.InvokeAsync(data);
     }
 }

@@ -62,11 +62,15 @@ namespace Whyvra.Blazor.Forms
             var propertyInfo = member.Member as PropertyInfo;
             var name = propertyInfo.Name;
 
+            var exprPath = propertyLambda.ToString();
+
             var input = new Input
             {
                 Name = name,
                 DisplayName = AddSpaces(name),
-                PropertyInfo = propertyInfo
+                Getter = propertyLambda.GetGetter(),
+                Setter = propertyLambda.GetSetter(),
+                ValidationPath = exprPath.Substring(exprPath.IndexOf('.') + 1)
             };
 
             _activeField = name;
@@ -123,11 +127,15 @@ namespace Whyvra.Blazor.Forms
             var propertyInfo = member.Member as PropertyInfo;
             var name = propertyInfo.Name;
 
+            var exprPath = propertyLambda.ToString();
+
             var tags = new TagsInput
             {
                 Name = name,
                 DisplayName = AddSpaces(name),
-                PropertyInfo = propertyInfo
+                Getter = propertyLambda.GetGetter(),
+                Setter = propertyLambda.GetSetter(),
+                ValidationPath = exprPath.Substring(exprPath.IndexOf('.') + 1)
             };
 
             _activeField = name;
@@ -142,13 +150,17 @@ namespace Whyvra.Blazor.Forms
             var propertyInfo = member.Member as PropertyInfo;
             var name = propertyInfo.Name;
 
+            var exprPath = propertyLambda.ToString();
+
             var input = new TextArea
             {
                 Name = name,
                 Columns = columns,
                 DisplayName = AddSpaces(name),
-                PropertyInfo = propertyInfo,
-                Rows = rows
+                Getter = propertyLambda.GetGetter(),
+                Rows = rows,
+                Setter = propertyLambda.GetSetter(),
+                ValidationPath = exprPath.Substring(exprPath.IndexOf('.') + 1)
             };
 
             _activeField = name;

@@ -91,12 +91,15 @@ else if (FormModel != null)
                         <span>Save changes</span>
                     </button>
                 }
-                <button class="button is-danger" @onclick="@(() => ShowDeleteConfirm = true)">
-                    <span class="icon">
-                        <i class="fas fa-trash-alt"></i>
-                    </span>
-                    <span>Delete</span>
-                </button>
+                @if (FormViewMode != FormViewMode.Blank)
+                {
+                    <button class="button is-danger" @onclick="@(() => ShowDeleteConfirm = true)">
+                        <span class="icon">
+                            <i class="fas fa-trash-alt"></i>
+                        </span>
+                        <span>Delete</span>
+                    </button>
+                }
                 <button class="button" @onclick="InvokeClose">
                     <span class="icon">
                         <i class="fas fa-times"></i>

@@ -173,7 +173,7 @@ namespace Whyvra.Tunnel.Presentation.Shared
             }
         }
 
-        private async Task ProcessDelete()
+        protected async Task ProcessDelete()
         {
             IsLoading = true;
             ShowDeleteConfirm = false;

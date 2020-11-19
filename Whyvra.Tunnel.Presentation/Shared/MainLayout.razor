@@ -1,4 +1,10 @@
-﻿@inherits LayoutComponentBase
+﻿@using Microsoft.Extensions.DependencyInjection
+
+@inherits LayoutComponentBase
+
+@inject NavigationManager NavigationManager
+@inject IOptions<AuthenticationOptions> Auth
+@inject IServiceProvider Services
 
 <NavBar />
 <section class="section">
@@ -6,3 +12,20 @@
         @Body
     </div>
 </section>
+
+@code
+{
+    protected override async Task OnInitializedAsync()
+    {
+        if (Auth.Value.Enabled)
+        {
+            var provider = Services.GetService<AuthenticationStateProvider>();
+            var state = await provider.GetAuthenticationStateAsync();
+
+            if (!state.User.Identity.IsAuthenticated)
+            {
+                NavigationManager.NavigateTo("/");
+            }
+        }
+    }
+}

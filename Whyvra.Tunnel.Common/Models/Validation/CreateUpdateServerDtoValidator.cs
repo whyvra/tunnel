@@ -1,7 +1,7 @@
 using FluentValidation;
-using Whyvra.Tunnel.Common.Models;
+using Whyvra.Tunnel.Common.Validation;
 
-namespace Whyvra.Tunnel.Common.Validation
+namespace Whyvra.Tunnel.Common.Models.Validation
 {
     public class CreateUpdateServerDtoValidator : AbstractValidator<CreateUpdateServerDto>
     {

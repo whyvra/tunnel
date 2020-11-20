@@ -2,7 +2,7 @@ using System;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 
-namespace Whyvra.Accounts.Api.Filters
+namespace Whyvra.Tunnel.Api.Filters
 {
     public class HttpExceptionFilter : IExceptionFilter
     {

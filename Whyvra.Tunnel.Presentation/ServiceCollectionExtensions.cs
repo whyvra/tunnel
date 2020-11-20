@@ -4,7 +4,7 @@ using Microsoft.AspNetCore.Components.WebAssembly.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Whyvra.Tunnel.Common.Models;
-using Whyvra.Tunnel.Common.Validation;
+using Whyvra.Tunnel.Common.Models.Validation;
 using Whyvra.Tunnel.Presentation.Authentication;
 using Whyvra.Tunnel.Presentation.Configuration;
 using Whyvra.Tunnel.Presentation.Services;

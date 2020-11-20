@@ -1,0 +1,62 @@
+@inject ServerService ServerService
+
+@page "/servers/{ServerId}"
+
+@if (_server != null)
+{
+    <article class="media">
+        <figure class="media-left" style="padding-right: 15px;">
+            <p class="is-size-1">
+                <span class="icon">
+                    <i class="fas fa-server"></i>
+                </span>
+            </p>
+        </figure>
+        <div class="media-content">
+            <p class="title is-4">@_server.Name</p>
+            <p class="subtitle is-6">@_server.Description</p>
+        </div>
+    </article>
+    <div class="buttons" style="padding-top: 1.5em;">
+        <button class="button is-primary">
+            <span class="icon">
+                <i class="fas fa-file"></i>
+            </span>
+            <span>Show server config</span>
+        </button>
+        <button class="button is-danger">
+            <span class="icon">
+                <i class="fas fa-ban"></i>
+            </span>
+            <span>Show revoked</span>
+        </button>
+    </div>
+    <div class="level is-mobile" style="padding-top: 1.5em;">
+        <div class="level-left">
+            <p class="title is-4">Clients</p>
+        </div>
+        <div class="level-right">
+            <button class="button is-success is-rounded">
+                <span class="icon">
+                    <i class="fas fa-user-plus"></i>
+                </span>
+                <span>New client</span>
+            </button>
+        </div>
+    </div>
+    <hr style="margin: 0;">
+}
+
+@code
+{
+    private ServerDto _server;
+
+    [Parameter]
+    public string ServerId { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        var id = int.Parse(ServerId);
+        _server = await ServerService.Get(id);
+    }
+}

@@ -35,12 +35,12 @@ namespace Whyvra.Tunnel.Common.Validation
 
                     var chunks = x.Split(':');
                     return chunks.Length == 2
-                        && chunks[0].IsIPv4Address()
+                        && (chunks[0].IsIPv4Address() || chunks[0].IsValidDomain())
                         && chunks[1].IsAllDigits()
                         && int.TryParse(chunks[1], out var port)
                         && 0 <= port && port <= 65535;
                 })
-                .WithMessage("{PropertyName} is not a valid address, please specify <IPAddress>:<port>.");
+                .WithMessage("{PropertyName} is not a valid address, please specify <IPAddress or domain>:<port>.");
 
             RuleFor(x => x.PublicKey)
                 .Length(44)

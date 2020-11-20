@@ -1,10 +1,9 @@
 ﻿@using Microsoft.Extensions.DependencyInjection
-@using Whyvra.Tunnel.Presentation.Services
-@using Whyvra.Tunnel.Common.Models
 
 @inject IOptions<AuthenticationOptions> Auth
-@inject ServerService ServerService
 @inject IServiceProvider Services
+@inject NavigationManager NavigationManager
+@inject ServerService ServerService
 
 @page "/"
 
@@ -25,7 +24,7 @@
         <AuthWrapper>
             <ChildContent>
                 <div class="select">
-                    <select>
+                    <select @onchange="GoToServer">
                         <option disabled>Pick a server</option>
                         @foreach(var server in servers)
                         {
@@ -101,5 +100,10 @@
         {
             servers = await ServerService.GetAll();
         }
+    }
+
+    private void GoToServer(ChangeEventArgs e)
+    {
+        NavigationManager.NavigateTo($"/servers/{e.Value.ToString()}");
     }
 }

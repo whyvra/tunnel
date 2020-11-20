@@ -1,3 +1,4 @@
+using System;
 using System.Linq;
 using System.Net;
 using System.Net.Sockets;
@@ -48,6 +49,13 @@ namespace Whyvra.Tunnel.Common.Validation
         public static bool IsIPv6Address(this string addr)
         {
             return IPAddress.TryParse(addr, out var ip) && ip.AddressFamily == AddressFamily.InterNetworkV6;
+        }
+
+        public static bool IsValidDomain(this string addr)
+        {
+            if(string.IsNullOrWhiteSpace(addr)) return false;
+
+            return Uri.CheckHostName(addr) != UriHostNameType.Unknown;
         }
     }
 }

@@ -16,6 +16,15 @@ namespace Whyvra.Tunnel.Api.Filters
                     StatusCode = 404
                 };
             }
+
+            if (context.Exception.GetType() == typeof(ArgumentException))
+            {
+                var error = new {message = context.Exception.Message, status = "Bad Request", statusCode = 400};
+                context.Result = new JsonResult(error)
+                {
+                    StatusCode = 400
+                };
+            }
         }
     }
 }

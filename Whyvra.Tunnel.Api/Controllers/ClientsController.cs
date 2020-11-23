@@ -2,6 +2,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Whyvra.Tunnel.Common.Queries;
+using Whyvra.Tunnel.Core.Clients.Commands;
 
 namespace Whyvra.Tunnel.Api.Controllers
 {
@@ -20,6 +21,37 @@ namespace Whyvra.Tunnel.Api.Controllers
             var client = await Mediator.Send(query, cancellationToken);
 
             return new JsonResult(client);
+        }
+
+        /// <summary>
+        /// Add a network address to a WireGuard client's allowed IPs
+        /// </summary>
+        /// <response code="201">Created</response>
+        [HttpPut("{id}/allowedips/{networkAddressId}")]
+        [ProducesResponseType(201)]
+        public async Task<IActionResult> Put(int id, int networkAddressId, CancellationToken cancellationToken)
+        {
+            var command = new AddAddressToClientCommand {ClientId = id, NetworkAddressId = networkAddressId};
+            var result = await Mediator.Send(command, cancellationToken);
+
+            return new JsonResult(new {id = result})
+            {
+                StatusCode = 201
+            };
+        }
+
+        /// <summary>
+        /// Remove a network address from a WireGuard client's allowed IPs
+        /// </summary>
+        /// <response code="204">NoContent</response>
+        [HttpDelete("{id}/allowedips/{networkAddressId}")]
+        [ProducesResponseType(204)]
+        public async Task<IActionResult> Delete(int id, int networkAddressId, CancellationToken cancellationToken)
+        {
+            var command = new RemoveAddressFromClientCommand {ClientId = id, NetworkAddressId = networkAddressId};
+            await Mediator.Send(command, cancellationToken);
+
+            return NoContent();
         }
     }
 }

@@ -12,6 +12,8 @@ namespace Whyvra.Blazor.Forms.Infrastructure
 
         public Action<object, object> Setter { get; set; }
 
+        public bool IsHidden { get; set; }
+
         public AsyncEventHandler<ChangeEventArgs> OnChangeAsyncHandler { get; set; }
 
         public EventHandler<ChangeEventArgs> OnChangeHandler { get; set; }

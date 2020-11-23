@@ -6,7 +6,7 @@
 @inject IServiceProvider services
 
 <form>
-    @foreach (var field in FormModel.Fields.Where(x => x is Input).Select(x => (Input)x))
+    @foreach (var field in FormModel.Fields.Where(x => x is Input input && !input.IsHidden).Select(x => (Input)x))
     {
         @if (field is TextArea area)
         {
@@ -14,7 +14,7 @@
                 <label for="@(field.Name)">@(field.DisplayName)</label>
                 <div class="control">
                     <textarea id="@(field.Name)" class="textarea has-fixed-size @(FormViewMode == FormViewMode.Readonly ? "is-static" : "")"
-                        placeholder="@(field.DisplayName)" value="@(field.Getter(FormModel.DataModel))"
+                        placeholder="@(field.DisplayName)" value="@(field.Getter(FormModel.DataModel) ?? string.Empty)"
                         @onchange="@(async (e) => await HandleChange(field, e))" readonly="@(FormViewMode == FormViewMode.Readonly)"
                         rows="@(area.Rows.HasValue ? $"{area.Rows.Value}" : "")"
                         columns="@(area.Columns.HasValue ? $"{area.Columns.Value}" : "")"
@@ -42,6 +42,19 @@
                     {
                         <ValidationMessage Messages="@field.ValidationMessages" />
                     }
+                </div>
+            </div>
+        }
+        else if (field is Checkbox checkbox)
+        {
+            <div class="field">
+                <div class="control">
+                    <label>
+                        <input type="checkbox" class="checkbox"
+                            checked="@field.Getter(FormModel.DataModel)"
+                            @onchange="@(e => HandleCheckbox(checkbox, e))" >
+                        @checkbox.DisplayName 
+                    </label>
                 </div>
             </div>
         }
@@ -104,7 +117,7 @@
     private async Task HandleChange(Input input, ChangeEventArgs e)
     {
         // Update data model
-        input.Setter(FormModel.DataModel, e.Value.ToString());
+        input.Setter(FormModel.DataModel, e.Value.ToString().Trim());
 
         // Fire off async handlers
         var asyncHandler = input.OnChangeAsyncHandler?.InvokeAllAsync(this, e) ?? Task.CompletedTask;
@@ -115,6 +128,23 @@
 
         // Wait for async handlers to complete
         await asyncHandler;
+    }
+
+    private void HandleCheckbox(Checkbox checkbox, ChangeEventArgs e)
+    {
+        // Update model with current value
+        var isChecked = (bool) e.Value;
+        checkbox.Setter(FormModel.DataModel, isChecked);
+
+        if (checkbox.FieldsToHideFunc != null)
+        {
+            // Hide selected fields
+            FormModel.Fields
+                .Where(x => x is Input input && checkbox.FieldsToHideFunc(input))
+                .Select(x => (Input) x)
+                .ToList()
+                .ForEach(x => x.IsHidden = isChecked);
+        }
     }
 
     private async Task HandleClick(Button button, MouseEventArgs e)

@@ -1,0 +1,42 @@
+@using Whyvra.Blazor.Forms.Renderer
+
+@if (_formModel != null)
+{
+    <div class="modal is-active">
+        <div class="modal-background"></div>
+        <div class="modal-card">
+            <header class="modal-card-head">
+                <div class="modal-card-title">
+                    <div class="level">
+                        <div class="level-left">
+                            <div class="level-item">
+                                <span class="icon has-text-info" style="padding-right: 10px;">
+                                    <i class="fas fa-user"></i>
+                                </span>
+                                <span>Client</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <button class="delete" aria-label="close" @onclick="@(async () => await HandleClose())"></button>
+            </header>
+            <section class="modal-card-body">
+                <BulmaForm FormModel="@_formModel"></BulmaForm>
+            </section>
+            <footer class="modal-card-foot">
+                <button class="button is-success">
+                    <span class="icon">
+                        <i class="fas fa-file"></i>
+                    </span>
+                    <span>Generate config</span>
+                </button>
+                <button class="button" @onclick="@(async () => await HandleClose())">
+                    <span class="icon">
+                        <i class="fas fa-times"></i>
+                    </span>
+                    <span>Cancel</span>
+                </button>
+            </footer>
+        </div>
+    </div>
+}

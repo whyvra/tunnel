@@ -52,7 +52,9 @@ namespace Whyvra.Tunnel.Presentation
 
             // Register validators
             builder.Services
+                .AddScoped<IValidator<CreateUpdateClientDto>>(_ => new CreateUpdateClientDtoValidator(false))
                 .AddScoped<IValidator<CreateUpdateServerDto>, CreateUpdateServerDtoValidator>()
+                .AddScoped<IValidator<ClientViewModel>, ClientViewModelValidator>()
                 .AddScoped<IValidator<ServerViewModel>, ServerViewModelValidator>();
 
             return services;

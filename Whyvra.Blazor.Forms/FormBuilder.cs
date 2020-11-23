@@ -45,12 +45,46 @@ namespace Whyvra.Blazor.Forms
             return this;
         }
 
+        public FormBuilder<TModel> Checkbox<TProperty>(Expression<Func<TModel, TProperty>> propertyLambda)
+        {
+            var member = propertyLambda.Body as MemberExpression;
+            var propertyInfo = member.Member as PropertyInfo;
+            var name = propertyInfo.Name;
+
+            var exprPath = propertyLambda.ToString();
+
+            var checkbox = new Checkbox
+            {
+                Name = name,
+                DisplayName = AddSpaces(name),
+                Getter = propertyLambda.GetGetter(),
+                Setter = propertyLambda.GetSetter(),
+                ValidationPath = exprPath.Substring(exprPath.IndexOf('.') + 1)
+            };
+
+            _activeField = name;
+            _fields.Add(name, checkbox);
+
+            return this;
+        }
+
         public FormBuilder<TModel> DisableUntilValid()
         {
             var field = _fields[_activeField];
             if (field is Button button)
             {
                 button.IsDisabledUntilValid = true;
+            }
+
+            return this;
+        }
+
+        public FormBuilder<TModel> HideOnCheck(Func<Input, bool> fieldsToHideFunc)
+        {
+            var field = _fields[_activeField];
+            if (field is Checkbox checkbox)
+            {
+                checkbox.FieldsToHideFunc = fieldsToHideFunc;
             }
 
             return this;

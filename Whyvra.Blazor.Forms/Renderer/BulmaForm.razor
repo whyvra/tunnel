@@ -114,6 +114,15 @@
         _isValidationEnabled = !(_validator == null);
     }
 
+    public void Validate()
+    {
+        FormModel.Fields
+            .Where(x => x is Input)
+            .Select(x => (Input) x)
+            .ToList()
+            .ForEach(TriggerValidation);
+    }
+
     private async Task HandleChange(Input input, ChangeEventArgs e)
     {
         // Update data model

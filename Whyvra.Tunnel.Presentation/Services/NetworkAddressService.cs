@@ -1,7 +1,6 @@
 using System.Collections.Generic;
 using System.Net.Http;
 using System.Net.Http.Json;
-using System.Text.Json;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Options;
 using Whyvra.Tunnel.Common.Commands;

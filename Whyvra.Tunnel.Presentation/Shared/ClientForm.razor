@@ -1,4 +1,14 @@
+@using System.Text
+@using FluentValidation
 @using Whyvra.Blazor.Forms.Renderer
+@using Whyvra.Crypto.X25519
+@using Whyvra.Tunnel.Common.Commands
+
+@inject ClientService ClientService
+@inject IValidator<ClientViewModel> Validator
+@inject NetworkAddressService NetworkAddressService
+@inject QrCodeService QrCodeService
+@inject TemplateService TemplateService
 
 @if (_formModel != null)
 {
@@ -18,19 +28,63 @@
                         </div>
                     </div>
                 </div>
-                <button class="delete" aria-label="close" @onclick="@(async () => await HandleClose())"></button>
+                <button class="delete" aria-label="close" @onclick="HandleClose"></button>
             </header>
             <section class="modal-card-body">
-                <BulmaForm FormModel="@_formModel"></BulmaForm>
+                @if (_isNotificationVisible)
+                {
+                    <div class="notification is-light is-@_notificationSeverity">
+                        <button class="delete" @onclick="@(() => _isNotificationVisible = false)"></button>
+                        <div class="level is-shrinkable">
+                            <div class="level-left">
+                                <div class="level-item">
+                                    @if (_notificationSeverity.Equals("danger"))
+                                    {
+                                        <span class="icon has-text-warning">
+                                            <i class="fas fa-exclamation-triangle"></i>
+                                        </span>
+                                    } else if (_notificationSeverity.Equals("success"))
+                                    {
+                                        <span class="icon">
+                                            <i class="fas fa-check"></i>
+                                        </span>
+                                    }
+                                </div>
+                                <div class="level-item">
+                                    @_notificationMessage
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                }
+                <BulmaForm @ref="_form" FormModel="@_formModel" FormViewMode="_formMode"></BulmaForm>
+                @if (_isConfigGenerated)
+                {
+                    <div class="has-text-centered">
+                        <img src="@((MarkupString) _qrCode)" width="400" alt="WireGuard confiugration QR code">
+                    </diV>
+                }
             </section>
             <footer class="modal-card-foot">
-                <button class="button is-success">
-                    <span class="icon">
-                        <i class="fas fa-file"></i>
-                    </span>
-                    <span>Generate config</span>
-                </button>
-                <button class="button" @onclick="@(async () => await HandleClose())">
+                @if (!_isConfigGenerated)
+                {
+                    <button class="button is-success @(_isLoading ? "is-loading" : "")" @onclick="GenerateConfig">
+                        <span class="icon">
+                            <i class="fas fa-file"></i>
+                        </span>
+                        <span>Generate config</span>
+                    </button>
+                }
+                else
+                {
+                    <a class="button is-primary" download="@($"{_formModel.DataModel.Client.Name}.conf")" href="@((MarkupString) _configuration)">
+                        <span class="icon">
+                            <i class="fas fa-file-download"></i>
+                        </span>
+                        <span>Download config</span>
+                    </a>
+                }
+                <button class="button" @onclick="HandleClose">
                     <span class="icon">
                         <i class="fas fa-times"></i>
                     </span>
@@ -39,4 +93,171 @@
             </footer>
         </div>
     </div>
+}
+
+@code
+{
+    private string _configuration;
+    private BulmaForm<ClientViewModel> _form;
+    private FormViewMode _formMode;
+    private FormModel<ClientViewModel> _formModel;
+    private bool _isConfigGenerated;
+    private bool _isLoading;
+    private bool _isNotificationVisible;
+    private string _notificationMessage;
+    private string _notificationSeverity;
+    private string _qrCode;
+    private bool _wasUpdated;
+
+    [Parameter]
+    public EventCallback<bool> CloseAction { get; set; }
+
+    [Parameter]
+    public ServerDto ServerDto { get; set; }
+
+    protected override Task OnInitializedAsync()
+    {
+        var viewModel = new ClientViewModel
+        {
+            AllowedIps = ServerDto.DefaultAllowedRange
+        };
+
+        _formModel = new FormBuilder<ClientViewModel>()
+            .Input(x => x.Client.Name).WithIcon("user")
+            .TextArea(x => x.Client.Description)
+            .Input(x => x.Client.AssignedIp).WithIcon("network-wired").WithText("Assigned IP")
+            .Checkbox(x => x.Client.IsIpAutoGenerated).HideOnCheck(x => x.Name.Equals("AssignedIp")).WithText("Use next available IP address")
+            .TagsInput(x => x.AllowedIps).WithDefaultEmptyValue("No IPs allowed").WithText("Allowed IPs")
+            .WithModel(viewModel)
+            .Build();
+
+        return Task.CompletedTask;
+    }
+
+    private async Task GenerateConfig()
+    {
+        // Hide previous notification
+        _isNotificationVisible = false;
+
+        // Validate model
+        var model = _formModel.DataModel;
+        var result = Validator.Validate(model);
+
+        if (!result.IsValid)
+        {
+            // Trigger form valiation
+            _form.Validate();
+            HandleNotification("Please fill the required fields in the form below.", "danger");
+            return;
+        }
+
+        // Set to loading
+        _isLoading = true;
+
+        // Generate key
+        var curve = new Curve25519();
+        var privateKey = curve.CreateRandomPrivateKey();
+        var publicKey = curve.GetPublicKey(privateKey);
+
+        // Update client with public key
+        var clientRequest = model.Client;
+        clientRequest.PublicKey = Convert.ToBase64String(publicKey);
+
+        // Set form to readonly
+        if (model.Client.IsIpAutoGenerated ?? false)
+        {
+            model.Client.AssignedIp = "Waiting on server";
+        }
+
+        _formMode = FormViewMode.Readonly;
+        _formModel = new FormBuilder<ClientViewModel>()
+            .Input(x => x.Client.Name).WithIcon("user")
+            .TextArea(x => x.Client.Description, rows: 1)
+            .Input(x => x.Client.AssignedIp).WithText("Assigned IP").WithIcon("network-wired")
+            .TagsInput(x => x.AllowedIps).WithText("Allowed IPs").WithDefaultEmptyValue("No IPs allowed")
+            .Input(x => x.Client.PublicKey).WithIcon("key")
+            .WithModel(model)
+            .Build();
+
+        // Create client
+        var clientId = await ClientService.CreateNew(ServerDto.Id, model.Client);
+
+        // Handle allowed IPs
+        await ProcessNetworkAddresses(clientId, model.AllowedIps, Enumerable.Empty<string>());
+
+        // Retrieve ClientDto
+        var client = await ClientService.Get(clientId);
+        model.Client.AssignedIp = client.AssignedIp;
+
+        // Generate config
+        var viewModel = new ClientConfigurationViewModel
+        {
+            Client = client,
+            Server = ServerDto,
+            PrivateKey = Convert.ToBase64String(privateKey)
+        };
+        var config = TemplateService.RenderClientConfiguration(viewModel);
+
+        // Generate QR code
+        var code = QrCodeService.RenderQrCode(config);
+
+        _configuration = $"data:text/plain;base64, {Convert.ToBase64String(Encoding.UTF8.GetBytes(config))}";
+        _qrCode = code;
+        _isConfigGenerated = true;
+        _wasUpdated = true;
+        _isLoading = false;
+
+        HandleNotification("Client added succesfully! Make sure to scan the QR code or " + 
+            "download the configuration as this is the only time it will be available.", "success");
+    }
+
+    private async Task HandleClose()
+    {
+        await CloseAction.InvokeAsync(_wasUpdated);
+    }
+
+    private void HandleNotification(string message, string severity)
+    {
+        _notificationMessage = message;
+        _notificationSeverity = severity;
+        _isNotificationVisible = true;
+    }
+
+    private async Task ProcessNetworkAddresses(int clientId, IEnumerable<string> newRange, IEnumerable<string> oldRange)
+    {
+        if (!newRange.SequenceEqual(oldRange))
+        {
+            // Figure out what needs to be added or removed
+            var toAdd = newRange.Except(oldRange);
+            var toRemove = oldRange.Except(newRange);
+
+            // Get all existing network addresses
+            var addresses = await NetworkAddressService.GetAll();
+
+            // Process address to add
+            foreach(var addr in toAdd)
+            {
+                if (addresses.Any(x => x.Address.Equals(addr)))
+                {
+                    // Address already exists so get it's ID and just add it
+                    var netId = addresses.Single(x => x.Address.Equals(addr)).Id;
+                    await ClientService.AddToAllowedIps(clientId, netId);
+                }
+                else
+                {
+                    // Address doesn't exist so create it first and then add it
+                    var command = new CreateNetworkAddressCommand { Address = addr };
+                    var id = await NetworkAddressService.CreateNew(command);
+                    await ClientService.RemoveFromAllowedIps(clientId, id);
+                }
+            }
+
+            // Process address to remove from server
+            foreach (var addr in toRemove)
+            {
+                var netId = addresses.Single(x => x.Address.Equals(addr)).Id;
+                await ClientService.RemoveFromAllowedIps(clientId, netId);
+            }
+        }
+    }
 }

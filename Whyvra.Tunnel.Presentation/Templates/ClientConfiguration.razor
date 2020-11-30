@@ -1,0 +1,15 @@
+@using Whyvra.Tunnel.Presentation.ViewModels
+[Interface]
+Address = @Model.Client.AssignedIp
+PrivateKey = @((MarkupString) @Model.PrivateKey)
+DNS = @Model.Server.Dns
+
+[Peer]
+PublicKey = @((MarkupString) @Model.Server.PublicKey)
+AllowedIPs = @string.Join(",", @Model.Client.AllowedIps)
+Endpoint = @Model.Server.Endpoint
+@code
+{
+    [Parameter]
+    public ClientConfigurationViewModel Model { get; set; }
+}

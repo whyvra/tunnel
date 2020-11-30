@@ -1,8 +1,10 @@
 using System;
+using Bunit;
 using FluentValidation;
 using Microsoft.AspNetCore.Components.WebAssembly.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using QRCoder;
 using Whyvra.Tunnel.Common.Models;
 using Whyvra.Tunnel.Common.Models.Validation;
 using Whyvra.Tunnel.Presentation.Authentication;
@@ -44,10 +46,18 @@ namespace Whyvra.Tunnel.Presentation
                 apiClient.AddHttpMessageHandler<CustomAuthorizationMessageHandler>();
             }
 
+            // Register service dependencies
+            builder.Services
+                .AddScoped<QRCodeGenerator>()
+                .AddScoped<TestContext>();
+
             // Register services
             builder.Services
+                .AddScoped<ClientService>()
                 .AddScoped<NetworkAddressService>()
+                .AddScoped<QrCodeService>()
                 .AddScoped<ServerService>()
+                .AddScoped<TemplateService>()
                 .AddScoped<UserService>();
 
             // Register validators

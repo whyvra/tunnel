@@ -1,0 +1,52 @@
+<div class="modal is-active" style="@ModalCss">
+    <div class="modal-background"></div>
+    <div class="modal-card">
+        <header class="modal-card-head">
+            <div class="modal-card-title">
+                <div class="level">
+                    <div class="level-left">
+                        <div class="level-item">
+                            <span class="icon @IconCss">
+                                <i class="fas fa-@Icon"></i>
+                            </span>
+                        </div>
+                        <div class="level-item">
+                            @Title
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <button class="delete" aria-label="close" @onclick="@(async () => await OnClose.InvokeAsync(null))"></button>
+        </header>
+        <section class="modal-card-body">
+            @ChildContent
+        </section>
+        <footer class="modal-card-foot">
+            @Buttons
+        </footer>
+    </div>
+</div>
+
+@code
+{
+    [Parameter]
+    public RenderFragment Buttons { get; set; }
+
+    [Parameter]
+    public RenderFragment ChildContent { get; set; }
+
+    [Parameter]
+    public string Icon { get; set; }
+
+    [Parameter]
+    public string IconCss { get; set; } = string.Empty;
+
+    [Parameter]
+    public string ModalCss { get; set; } = string.Empty;
+
+    [Parameter]
+    public EventCallback OnClose { get; set; }
+
+    [Parameter]
+    public string Title { get; set; }
+}

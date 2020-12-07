@@ -2,7 +2,6 @@
 @using FluentValidation
 @using Whyvra.Blazor.Forms.Renderer
 @using Whyvra.Crypto.X25519
-@using Whyvra.Tunnel.Common.Commands
 
 @inject ClientService ClientService
 @inject IValidator<ClientViewModel> Validator
@@ -12,87 +11,47 @@
 
 @if (_formModel != null)
 {
-    <div class="modal is-active">
-        <div class="modal-background"></div>
-        <div class="modal-card">
-            <header class="modal-card-head">
-                <div class="modal-card-title">
-                    <div class="level">
-                        <div class="level-left">
-                            <div class="level-item">
-                                <span class="icon has-text-info" style="padding-right: 10px;">
-                                    <i class="fas fa-user-plus"></i>
-                                </span>
-                                <span>New client</span>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <button class="delete" aria-label="close" @onclick="HandleClose"></button>
-            </header>
-            <section class="modal-card-body">
-                @if (_isNotificationVisible)
-                {
-                    <div class="notification is-light is-@_notificationSeverity">
-                        <button class="delete" @onclick="@(() => _isNotificationVisible = false)"></button>
-                        <div class="level is-shrinkable">
-                            <div class="level-left">
-                                <div class="level-item">
-                                    @if (_notificationSeverity.Equals("danger"))
-                                    {
-                                        <span class="icon has-text-warning">
-                                            <i class="fas fa-exclamation-triangle"></i>
-                                        </span>
-                                    } else if (_notificationSeverity.Equals("success"))
-                                    {
-                                        <span class="icon">
-                                            <i class="fas fa-check"></i>
-                                        </span>
-                                    }
-                                </div>
-                                <div class="level-item">
-                                    @_notificationMessage
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                }
-                <BulmaForm @ref="_form" FormModel="@_formModel" FormViewMode="_formMode"></BulmaForm>
-                @if (_isConfigGenerated)
-                {
-                    <div class="has-text-centered">
-                        <img src="@((MarkupString) _qrCode)" width="400" alt="WireGuard confiugration QR code">
-                    </diV>
-                }
-            </section>
-            <footer class="modal-card-foot">
-                @if (!_isConfigGenerated)
-                {
-                    <button class="button is-success @(_isLoading ? "is-loading" : "")" @onclick="GenerateConfig">
-                        <span class="icon">
-                            <i class="fas fa-file"></i>
-                        </span>
-                        <span>Generate config</span>
-                    </button>
-                }
-                else
-                {
-                    <a class="button is-primary" download="@($"{_formModel.DataModel.Client.Name}.conf")" href="@((MarkupString) _configuration)">
-                        <span class="icon">
-                            <i class="fas fa-file-download"></i>
-                        </span>
-                        <span>Download config</span>
-                    </a>
-                }
-                <button class="button" @onclick="HandleClose">
+    <Modal Icon="user-plus" IconCss="has-text-info" Title="New client" OnClose="HandleClose">
+        <ChildContent>
+            @if (_isNotificationVisible)
+            {
+                <Notification NotificationDto="@_notification" OnClose="@(() => _isNotificationVisible = false)"></Notification>
+            }
+            <BulmaForm @ref="_form" FormModel="@_formModel" FormViewMode="_formMode"></BulmaForm>
+            @if (_isConfigGenerated)
+            {
+                <div class="has-text-centered">
+                    <img src="@((MarkupString) _qrCode)" width="400" alt="WireGuard confiugration QR code">
+                </diV>
+            }
+        </ChildContent>
+        <Buttons>
+            @if (!_isConfigGenerated)
+            {
+                <button class="button is-success @(_isLoading ? "is-loading" : "")" @onclick="GenerateConfig">
                     <span class="icon">
-                        <i class="fas fa-times"></i>
+                        <i class="fas fa-file"></i>
                     </span>
-                    <span>Close</span>
+                    <span>Generate config</span>
                 </button>
-            </footer>
-        </div>
-    </div>
+            }
+            else
+            {
+                <a class="button is-primary" download="@($"{_formModel.DataModel.Client.Name}.conf")" href="@((MarkupString) _configuration)">
+                    <span class="icon">
+                        <i class="fas fa-file-download"></i>
+                    </span>
+                    <span>Download config</span>
+                </a>
+            }
+            <button class="button" @onclick="HandleClose">
+                <span class="icon">
+                    <i class="fas fa-times"></i>
+                </span>
+                <span>Close</span>
+            </button>
+        </Buttons>
+    </Modal>
 }
 
 @code
@@ -104,8 +63,7 @@
     private bool _isConfigGenerated;
     private bool _isLoading;
     private bool _isNotificationVisible;
-    private string _notificationMessage;
-    private string _notificationSeverity;
+    private NotificationDto _notification;
     private string _qrCode;
     private bool _wasUpdated;
 
@@ -168,7 +126,7 @@
         var clientId = await ClientService.CreateNew(ServerDto.Id, model.Client);
 
         // Handle allowed IPs
-        await ProcessNetworkAddresses(clientId, model.AllowedIps, Enumerable.Empty<string>());
+        await NetworkAddressService.ProcessNetworkAddresses(ClientService, clientId, model.AllowedIps, Enumerable.Empty<string>());
 
         // Retrieve ClientDto
         var client = await ClientService.Get(clientId);
@@ -214,46 +172,27 @@
 
     private void HandleNotification(string message, string severity)
     {
-        _notificationMessage = message;
-        _notificationSeverity = severity;
-        _isNotificationVisible = true;
-    }
 
-    private async Task ProcessNetworkAddresses(int clientId, IEnumerable<string> newRange, IEnumerable<string> oldRange)
-    {
-        if (!newRange.SequenceEqual(oldRange))
+        if (severity.Equals("success"))
         {
-            // Figure out what needs to be added or removed
-            var toAdd = newRange.Except(oldRange);
-            var toRemove = oldRange.Except(newRange);
-
-            // Get all existing network addresses
-            var addresses = await NetworkAddressService.GetAll();
-
-            // Process address to add
-            foreach(var addr in toAdd)
+            _notification = new NotificationDto
             {
-                if (addresses.Any(x => x.Address.Equals(addr)))
-                {
-                    // Address already exists so get it's ID and just add it
-                    var netId = addresses.Single(x => x.Address.Equals(addr)).Id;
-                    await ClientService.AddToAllowedIps(clientId, netId);
-                }
-                else
-                {
-                    // Address doesn't exist so create it first and then add it
-                    var command = new CreateNetworkAddressCommand { Address = addr };
-                    var id = await NetworkAddressService.CreateNew(command);
-                    await ClientService.RemoveFromAllowedIps(clientId, id);
-                }
-            }
-
-            // Process address to remove from server
-            foreach (var addr in toRemove)
-            {
-                var netId = addresses.Single(x => x.Address.Equals(addr)).Id;
-                await ClientService.RemoveFromAllowedIps(clientId, netId);
-            }
+                Icon = "check",
+                IconCss = string.Empty,
+                Message = message,
+                Severity = severity
+            };
         }
+        else if (severity.Equals("danger"))
+        {
+            _notification = new NotificationDto
+            {
+                Icon = "exclamation-triangle",
+                IconCss = "has-text-warning",
+                Message = message,
+                Severity = severity
+            };
+        }
+        _isNotificationVisible = true;
     }
 }

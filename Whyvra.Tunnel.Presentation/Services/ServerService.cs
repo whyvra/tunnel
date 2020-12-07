@@ -8,7 +8,7 @@ using Whyvra.Tunnel.Presentation.Configuration;
 
 namespace Whyvra.Tunnel.Presentation.Services
 {
-    public class ServerService
+    public class ServerService : INetworkEntityService
     {
         private readonly HttpClient _http;
         private readonly ApiOptions _api;
@@ -19,7 +19,7 @@ namespace Whyvra.Tunnel.Presentation.Services
             _api = api.Value;
         }
 
-        public async Task AddToAllowedRange(int id, int networkAddressId)
+        public async Task AddNetworkAddress(int id, int networkAddressId)
         {
             var result = await _http.PutAsync($"{_api.Url}/servers/{id}/allowedrange/{networkAddressId}", null);
             result.EnsureSuccessStatusCode();
@@ -50,7 +50,7 @@ namespace Whyvra.Tunnel.Presentation.Services
             return await _http.GetFromJsonAsync<IEnumerable<ServerDto>>($"{_api.Url}/servers");
         }
 
-        public async Task RemoveFromAllowedRange(int id, int networkAddressId)
+        public async Task RemoveNetworkAddress(int id, int networkAddressId)
         {
             var result = await _http.DeleteAsync($"{_api.Url}/servers/{id}/allowedrange/{networkAddressId}");
             result.EnsureSuccessStatusCode();

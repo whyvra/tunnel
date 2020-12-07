@@ -13,102 +13,69 @@ else if (FormModel != null)
 {
     @if(ShowDeleteConfirm)
     {
-        <div class="modal is-active" style="z-index: 45;">
-            <div class="modal-background"></div>
-            <div class="modal-content">
-                <div class="card" style="padding: 1.2em;">
-                    <div class="level">
-                        <div class="level-left">
-                            <div class="level-item is-size-4">
-                                <span class="icon has-text-danger" style="padding-right: 10px;">
-                                    <i class="fas fa-trash-alt"></i>
-                                </span>
-                                <span>Confirm deletion</span>
-                            </div>
-                        </div>
-                        <div class="level-right">
-                            <button class="delete" aria-label="close" @onclick="@(() => ShowDeleteConfirm = false)"></button>
-                        </div>
-                    </div>
-                    <p>
-                        Are you sure you want to delete server @FormModel.DataModel.Server.Name ?
-                        All it's data along with its clients configuration will be lost!</p>
-                    <div class="buttons" style="padding-top: 1.2em;">
-                        <button class="button is-success" @onclick="ProcessDelete">
-                            <span class="icon">
-                                <i class="fas fa-check"></i>
-                            </span>
-                            <span>Yes</span>
-                        </button>
-                        <button class="button is-danger" @onclick="@(() => ShowDeleteConfirm = false)">
-                            <span class="icon">
-                                <i class="fas fa-times"></i>
-                            </span>
-                            <span>No</span>
-                        </button>
-                    </div>
-                </div>
-            </div>
-        </div>
-    }
-    <div class="modal is-active">
-        <div class="modal-background"></div>
-        <div class="modal-card">
-            <header class="modal-card-head">
-                <div class="modal-card-title">
-                    <div class="level">
-                        <div class="level-left">
-                            <div class="level-item">
-                                <span class="icon has-text-info" style="padding-right: 10px;">
-                                    <i class="fas fa-info-circle"></i>
-                                </span>
-                                <span>Server info</span>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <button class="delete" aria-label="close" @onclick="InvokeClose"></button>
-            </header>
-            <section class="modal-card-body">
-                <BulmaForm FormModel="@FormModel" FormViewMode="@FormViewMode"></BulmaForm>
-            </section>
-            <footer class="modal-card-foot">
-                @if (FormViewMode == FormViewMode.Readonly)
-                {
-                    <button class="button is-warning" @onclick="@(() => FormViewMode = FormViewMode.Edit)">
-                        <span class="icon">
-                            <i class="fas fa-pencil-alt"></i>
-                        </span>
-                        <span>Edit</span>
-                    </button>
-                }
-                @if (FormViewMode != FormViewMode.Readonly)
-                {
-                    <button class="button is-primary" @onclick="SaveChanges">
-                        <span class="icon">
-                            <i class="fas fa-save"></i>
-                        </span>
-                        <span>Save changes</span>
-                    </button>
-                }
-                @if (FormViewMode != FormViewMode.Blank)
-                {
-                    <button class="button is-danger" @onclick="@(() => ShowDeleteConfirm = true)">
-                        <span class="icon">
-                            <i class="fas fa-trash-alt"></i>
-                        </span>
-                        <span>Delete</span>
-                    </button>
-                }
-                <button class="button" @onclick="InvokeClose">
+        <Modal Icon="trash-alt" IconCss="has-text-danger" ModalCss="z-index: 45;" OnClose="@(() => ShowDeleteConfirm = false)" Title="Confirm deletion">
+            <ChildContent>
+                <p>
+                    Are you sure you want to delete server @FormModel.DataModel.Server.Name ?
+                    All it's data along with its clients configuration will be lost!
+                </p>
+            </ChildContent>
+            <Buttons>
+                <button class="button is-success" @onclick="ProcessDelete">
+                    <span class="icon">
+                        <i class="fas fa-check"></i>
+                    </span>
+                    <span>Yes</span>
+                </button>
+                <button class="button is-danger" @onclick="@(() => ShowDeleteConfirm = false)">
                     <span class="icon">
                         <i class="fas fa-times"></i>
                     </span>
-                    <span>Cancel</span>
+                    <span>No</span>
                 </button>
-            </footer>
-        </div>
-    </div>
+            </Buttons>
+        </Modal>
+    }
+    <Modal Icon="info-circle" IconCss="has-text-info" OnClose="InvokeClose" Title="Server info">
+        <ChildContent>
+            <BulmaForm FormModel="@FormModel" FormViewMode="@FormViewMode"></BulmaForm>
+        </ChildContent>
+        <Buttons>
+            @if (FormViewMode == FormViewMode.Readonly)
+            {
+                <button class="button is-warning" @onclick="@(() => FormViewMode = FormViewMode.Edit)">
+                    <span class="icon">
+                        <i class="fas fa-pencil-alt"></i>
+                    </span>
+                    <span>Edit</span>
+                </button>
+            }
+            @if (FormViewMode != FormViewMode.Readonly)
+            {
+                <button class="button is-primary" @onclick="SaveChanges">
+                    <span class="icon">
+                        <i class="fas fa-save"></i>
+                    </span>
+                    <span>Save changes</span>
+                </button>
+            }
+            @if (FormViewMode != FormViewMode.Blank)
+            {
+                <button class="button is-danger" @onclick="@(() => ShowDeleteConfirm = true)">
+                    <span class="icon">
+                        <i class="fas fa-trash-alt"></i>
+                    </span>
+                    <span>Delete</span>
+                </button>
+            }
+            <button class="button" @onclick="InvokeClose">
+                <span class="icon">
+                    <i class="fas fa-times"></i>
+                </span>
+                <span>Cancel</span>
+            </button>
+        </Buttons>
+    </Modal>
 }
 
 @code

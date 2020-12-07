@@ -1,11 +1,9 @@
-using System.Collections.Generic;
 using System.Linq;
 using System.Text.Json;
 using System.Threading.Tasks;
 using FluentValidation;
 using Microsoft.AspNetCore.Components;
 using Whyvra.Blazor.Forms;
-using Whyvra.Tunnel.Common.Commands;
 using Whyvra.Tunnel.Common.Models;
 using Whyvra.Tunnel.Presentation.Services;
 using Whyvra.Tunnel.Presentation.ViewModels;
@@ -107,7 +105,7 @@ namespace Whyvra.Tunnel.Presentation.Shared
                 {
                     var id = await ServerService.CreateNew(model.Server);
                     wasUpdated = true;
-                    await ProcessNetWorkAddresses(id, model.DefaultAllowedRange, Enumerable.Empty<string>());
+                    await NetworkAddressService.ProcessNetworkAddresses(ServerService, id, model.DefaultAllowedRange, Enumerable.Empty<string>());
                 }
 
                 // Trigger modal close
@@ -130,47 +128,9 @@ namespace Whyvra.Tunnel.Presentation.Shared
             }
 
             // Process network address in DefaultAllowedRange
-            await ProcessNetWorkAddresses(serverId, viewModel.DefaultAllowedRange, original.DefaultAllowedRange);
+            await NetworkAddressService.ProcessNetworkAddresses(ServerService, serverId, viewModel.DefaultAllowedRange, original.DefaultAllowedRange);
 
             return wasUpdated;
-        }
-
-        private async Task ProcessNetWorkAddresses(int serverId, IEnumerable<string> newRange, IEnumerable<string> oldRange)
-        {
-            if (!newRange.SequenceEqual(oldRange))
-            {
-                // Figure out what needs to be added or removed
-                var toAdd = newRange.Except(oldRange);
-                var toRemove = oldRange.Except(newRange);
-
-                // Get all existing network addresses
-                var addresses = await NetworkAddressService.GetAll();
-
-                // Process address to add
-                foreach(var addr in toAdd)
-                {
-                    if (addresses.Any(x => x.Address.Equals(addr)))
-                    {
-                        // Address already exists so get it's ID and just add it
-                        var netId = addresses.Single(x => x.Address.Equals(addr)).Id;
-                        await ServerService.AddToAllowedRange(serverId, netId);
-                    }
-                    else
-                    {
-                        // Address doesn't exist so create it first and then add it
-                        var command = new CreateNetworkAddressCommand { Address = addr };
-                        var id = await NetworkAddressService.CreateNew(command);
-                        await ServerService.AddToAllowedRange(serverId, id);
-                    }
-                }
-
-                // Process address to remove from server
-                foreach (var addr in toRemove)
-                {
-                    var netId = addresses.Single(x => x.Address.Equals(addr)).Id;
-                    await ServerService.RemoveFromAllowedRange(serverId, netId);
-                }
-            }
         }
 
         protected async Task ProcessDelete()

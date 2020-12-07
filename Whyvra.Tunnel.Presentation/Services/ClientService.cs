@@ -7,7 +7,7 @@ using Whyvra.Tunnel.Presentation.Configuration;
 
 namespace Whyvra.Tunnel.Presentation.Services
 {
-    public class ClientService
+    public class ClientService : INetworkEntityService
     {
         private readonly HttpClient _http;
         private readonly ApiOptions _api;
@@ -18,7 +18,7 @@ namespace Whyvra.Tunnel.Presentation.Services
             _api = api.Value;
         }
 
-        public async Task AddToAllowedIps(int id, int networkAddressId)
+        public async Task AddNetworkAddress(int id, int networkAddressId)
         {
             var result = await _http.PutAsync($"{_api.Url}/clients/{id}/allowedips/{networkAddressId}", null);
             result.EnsureSuccessStatusCode();
@@ -38,7 +38,7 @@ namespace Whyvra.Tunnel.Presentation.Services
             return await _http.GetFromJsonAsync<ClientDto>($"{_api.Url}/clients/{id}");
         }
 
-        public async Task RemoveFromAllowedIps(int id, int networkAddressId)
+        public async Task RemoveNetworkAddress(int id, int networkAddressId)
         {
             var result = await _http.DeleteAsync($"{_api.Url}/clients/{id}/allowedips/{networkAddressId}");
             result.EnsureSuccessStatusCode();

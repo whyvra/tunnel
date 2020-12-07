@@ -1,9 +1,4 @@
-﻿@using Microsoft.Extensions.DependencyInjection
-
-@inject IOptions<AuthenticationOptions> Auth
-@inject IServiceProvider Services
-@inject NavigationManager NavigationManager
-@inject ServerService ServerService
+@using Microsoft.Extensions.DependencyInjection
 
 @page "/"
 
@@ -23,15 +18,7 @@
     <div class="actions-panel">
         <AuthWrapper>
             <ChildContent>
-                <div class="select">
-                    <select @onchange="GoToServer">
-                        <option disabled>Pick a server</option>
-                        @foreach(var server in servers)
-                        {
-                        <option value="@server.Id">@server.Name</option>
-                        }
-                    </select>
-                </div>
+                <ServerDropdown></ServerDropdown>
                 <NavLink class="button is-primary" href="/servers">
                     <span class="icon">
                         <i class="fas fa-server"></i>
@@ -84,26 +71,4 @@
         new Tile {Title = "Cross-platform", Icon = "desktop", Text = "Built with .NET Core which means Tunnel can run on any of the supported platforms including Windows, Linux and MacOS."},
         new Tile {Title = "Open Source", Icon = "code", Text = "The code for Tunnel is open-sourced and available publicly via Git. It is published under the MIT license"}
     };
-
-    protected override async Task OnInitializedAsync()
-    {
-        if (Auth.Value.Enabled)
-        {
-            var provider = Services.GetService<AuthenticationStateProvider>();
-            var state = await provider.GetAuthenticationStateAsync();
-            if (state.User.Identity.IsAuthenticated)
-            {
-                servers = await ServerService.GetAll();
-            }
-        }
-        else
-        {
-            servers = await ServerService.GetAll();
-        }
-    }
-
-    private void GoToServer(ChangeEventArgs e)
-    {
-        NavigationManager.NavigateTo($"/servers/{e.Value.ToString()}");
-    }
 }

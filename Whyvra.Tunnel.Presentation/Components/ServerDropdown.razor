@@ -1,0 +1,27 @@
+@inject NavigationManager NavigationManager
+@inject ServerService ServerService
+
+<div class="select">
+    <select @onchange="GoToServer">
+        <option disabled>Pick a server</option>
+        @foreach(var server in servers)
+        {
+        <option value="@server.Id">@server.Name</option>
+        }
+    </select>
+</div>
+
+@code
+{
+    private IEnumerable<ServerDto> servers = Enumerable.Empty<ServerDto>();
+
+    protected override async Task OnInitializedAsync()
+    {
+        servers = await ServerService.GetAll();
+    }
+
+    private void GoToServer(ChangeEventArgs e)
+    {
+        NavigationManager.NavigateTo($"/servers/{e.Value.ToString()}");
+    }
+}

@@ -26,7 +26,7 @@ namespace Whyvra.Tunnel.Core.Clients.Queries
                 {
                     Id = x.Id,
                     Name = x.Name,
-                    Description = x.Name,
+                    Description = x.Description,
                     AllowedIps = x.AllowedIps
                         .Select(n => $"{n.NetworkAddress.Address.addr}/{n.NetworkAddress.Address.cidr}")
                         .ToList(),

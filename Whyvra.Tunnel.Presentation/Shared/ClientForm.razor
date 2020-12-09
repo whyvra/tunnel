@@ -1,0 +1,74 @@
+@using Whyvra.Blazor.Forms.Renderer
+
+@inject ClientService ClientService
+
+@if (_formModel != null)
+{
+    <Modal Icon="user" Title="Client" IconCss="has-text-info" OnClose="HandleClose">
+        <ChildContent>
+            <BulmaForm FormModel="_formModel" FormViewMode="@FormViewMode.Readonly"></BulmaForm>
+        </ChildContent>
+        <Buttons>
+            <button class="button is-warning">
+                <span class="icon">
+                    <i class="fas fa-pencil-alt"></i>
+                </span>
+                <span>Edit</span>
+            </button>
+            <button class="button is-danger">
+                <span class="icon">
+                    <i class="fas fa-ban"></i>
+                </span>
+                <span>Revoke</span>
+            </button>
+            <button class="button" @onclick="HandleClose">
+                <span class="icon">
+                    <i class="fas fa-times"></i>
+                </span>
+                <span>Close</span>
+            </button>
+        </Buttons>
+    </Modal>
+}
+
+@code
+{
+    private FormModel<UpdateClientViewModel> _formModel;
+
+    [Parameter]
+    public int ClientId { get; set; }
+
+    [Parameter]
+    public EventCallback<bool> OnClose { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        var client = await ClientService.Get(ClientId);
+
+        var viewModel = new UpdateClientViewModel
+        {
+            Client = new UpdateClientDto
+            {
+                Name = client.Name,
+                Description = client.Description,
+                AssignedIp = client.AssignedIp,
+                PublicKey = client.PublicKey
+            },
+            AllowedIps = client.AllowedIps
+        };
+
+        _formModel = new FormBuilder<UpdateClientViewModel>()
+            .Input(x => x.Client.Name).WithIcon("user")
+            .TextArea(x => x.Client.Description)
+            .Input(x => x.Client.AssignedIp).WithIcon("network-wired").WithText("Assigned IP")
+            .TagsInput(x => x.AllowedIps).WithText("Allowed IPs").WithDefaultEmptyValue("No IPs allowed")
+            .Input(x => x.Client.PublicKey).WithIcon("key")
+            .WithModel(viewModel)
+            .Build();
+    }
+
+    private async Task HandleClose()
+    {
+        await OnClose.InvokeAsync(false);
+    }
+}

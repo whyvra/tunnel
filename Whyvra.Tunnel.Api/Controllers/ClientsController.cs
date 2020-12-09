@@ -1,6 +1,7 @@
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
+using Whyvra.Tunnel.Common.Models;
 using Whyvra.Tunnel.Common.Queries;
 using Whyvra.Tunnel.Core.Clients.Commands;
 
@@ -15,12 +16,26 @@ namespace Whyvra.Tunnel.Api.Controllers
         /// <response code="201">Created</response>
         [HttpGet("{id}")]
         [ProducesResponseType(200)]
-        public async Task<IActionResult> GetTask(int id, CancellationToken cancellationToken)
+        public async Task<IActionResult> Get(int id, CancellationToken cancellationToken)
         {
             var query = new GetClientByIdQuery {Id = id};
             var client = await Mediator.Send(query, cancellationToken);
 
             return new JsonResult(client);
+        }
+
+        /// <summary>
+        /// Update a WireGuard client
+        /// </summary>
+        /// <response code="204">NoContent</response>
+        [HttpPut("{id}")]
+        [ProducesResponseType(204)]
+        public async Task<IActionResult> Put(int id, [FromBody] UpdateClientDto client, CancellationToken cancellationToken)
+        {
+            var command = new UpdateClientCommand {Id = id, Client = client};
+            await Mediator.Send(command, cancellationToken);
+
+            return NoContent();
         }
 
         /// <summary>

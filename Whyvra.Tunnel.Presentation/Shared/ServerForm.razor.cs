@@ -4,7 +4,9 @@ using System.Threading.Tasks;
 using FluentValidation;
 using Microsoft.AspNetCore.Components;
 using Whyvra.Blazor.Forms;
+using Whyvra.Blazor.Forms.Renderer;
 using Whyvra.Tunnel.Common.Models;
+using Whyvra.Tunnel.Presentation.Components;
 using Whyvra.Tunnel.Presentation.Services;
 using Whyvra.Tunnel.Presentation.ViewModels;
 
@@ -17,9 +19,12 @@ namespace Whyvra.Tunnel.Presentation.Shared
         private ServerDto _server;
 
         // Properties shared with component
+        public BulmaForm<ServerViewModel> Form { get; set; }
         public FormModel<ServerViewModel> FormModel { get; set; }
         public FormViewMode FormViewMode { get; set; } = FormViewMode.Readonly;
         public bool IsLoading { get; set; }
+        public bool IsNotificationVisible { get; set; }
+        public NotificationDto Notification { get; set; }
         public bool ShowDeleteConfirm { get; set; }
 
         // Injectable properties
@@ -89,6 +94,20 @@ namespace Whyvra.Tunnel.Presentation.Shared
             // Check if model is valid
             var model = FormModel.DataModel;
             var result = Validator.Validate(model);
+
+            if (!result.IsValid)
+            {
+                Form.Validate();
+                Notification = new NotificationDto
+                {
+                    Icon = "exclamation-triangle",
+                    IconCss = "has-text-warning",
+                    Message = "Please fill the required fields in the form below.",
+                    Severity = "danger"
+                };
+                IsNotificationVisible = true;
+                return;
+            }
 
             if (result.IsValid)
             {

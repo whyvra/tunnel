@@ -64,8 +64,10 @@ namespace Whyvra.Tunnel.Presentation
             builder.Services
                 .AddScoped<IValidator<CreateUpdateClientDto>>(_ => new CreateUpdateClientDtoValidator(false))
                 .AddScoped<IValidator<CreateUpdateServerDto>, CreateUpdateServerDtoValidator>()
+                .AddScoped<IValidator<UpdateClientDto>, UpdateClientDtoValidator>()
                 .AddScoped<IValidator<ClientViewModel>, ClientViewModelValidator>()
-                .AddScoped<IValidator<ServerViewModel>, ServerViewModelValidator>();
+                .AddScoped<IValidator<ServerViewModel>, ServerViewModelValidator>()
+                .AddScoped<IValidator<UpdateClientViewModel>, UpdateClientViewModelValidator>();
 
             return services;
         }

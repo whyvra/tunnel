@@ -38,7 +38,11 @@ else if (FormModel != null)
     }
     <Modal Icon="info-circle" IconCss="has-text-info" OnClose="InvokeClose" Title="Server info">
         <ChildContent>
-            <BulmaForm FormModel="@FormModel" FormViewMode="@FormViewMode"></BulmaForm>
+            @if (IsNotificationVisible)
+            {
+                <Notification NotificationDto="@Notification" OnClose="@(() => IsNotificationVisible = false)"></Notification>
+            }
+            <BulmaForm @ref="Form" FormModel="@FormModel" FormViewMode="@FormViewMode"></BulmaForm>
         </ChildContent>
         <Buttons>
             @if (FormViewMode == FormViewMode.Readonly)

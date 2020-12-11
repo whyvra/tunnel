@@ -43,5 +43,11 @@ namespace Whyvra.Tunnel.Presentation.Services
             var result = await _http.DeleteAsync($"{_api.Url}/clients/{id}/allowedips/{networkAddressId}");
             result.EnsureSuccessStatusCode();
         }
+
+        public async Task Update(int id, UpdateClientDto client)
+        {
+            var result = await _http.PutAsJsonAsync($"{_api.Url}/clients/{id}", client);
+            result.EnsureSuccessStatusCode();
+        }
     }
 }

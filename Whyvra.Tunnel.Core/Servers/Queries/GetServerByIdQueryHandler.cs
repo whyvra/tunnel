@@ -29,6 +29,7 @@ namespace Whyvra.Tunnel.Core.Servers.Queries
                     Description = x.Description,
                     AssignedRange = $"{x.AssignedRange.addr}/{x.AssignedRange.cidr}",
                     Clients = x.Clients
+                        .Where(c => !c.IsRevoked)
                         .Select(c => new ClientDto
                         {
                             Id = c.Id,

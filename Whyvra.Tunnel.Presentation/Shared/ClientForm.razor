@@ -1,21 +1,50 @@
+@using System.Text.Json
+@using FluentValidation
 @using Whyvra.Blazor.Forms.Renderer
 
 @inject ClientService ClientService
+@inject NetworkAddressService NetworkAddressService
+@inject IValidator<UpdateClientViewModel> Validator
 
-@if (_formModel != null)
+@if (_isLoading)
+{
+    <div class="modal is-active">
+        <div class="modal-background"></div>
+        <div class="modal-content modal-loader">
+            <button class="button is-loading is-large"></button>
+        </div>
+    </div>
+}
+else if (_formModel != null)
 {
     <Modal Icon="user" Title="Client" IconCss="has-text-info" OnClose="HandleClose">
         <ChildContent>
-            <BulmaForm FormModel="_formModel" FormViewMode="@FormViewMode.Readonly"></BulmaForm>
+            @if (_isNotificationVisible)
+            {
+                <Notification NotificationDto="@_notification" OnClose="@(() => _isNotificationVisible = false)"></Notification>
+            }
+            <BulmaForm @ref="_form" FormModel="_formModel" FormViewMode="_formMode"></BulmaForm>
         </ChildContent>
         <Buttons>
-            <button class="button is-warning">
-                <span class="icon">
-                    <i class="fas fa-pencil-alt"></i>
-                </span>
-                <span>Edit</span>
-            </button>
-            <button class="button is-danger">
+            @if (_formMode == FormViewMode.Readonly)
+            {
+                <button class="button is-warning" @onclick="@(() => _formMode = FormViewMode.Edit)">
+                    <span class="icon">
+                        <i class="fas fa-pencil-alt"></i>
+                    </span>
+                    <span>Edit</span>
+                </button>
+            }
+            @if (_formMode != FormViewMode.Readonly)
+            {
+                <button class="button is-primary" @onclick="SaveChanges">
+                    <span class="icon">
+                        <i class="fas fa-save"></i>
+                    </span>
+                    <span>Save changes</span>
+                </button>
+            }
+            <button class="button is-danger" disabled="@(_formMode == FormViewMode.Edit)" @onclick="Revoke">
                 <span class="icon">
                     <i class="fas fa-ban"></i>
                 </span>
@@ -33,7 +62,13 @@
 
 @code
 {
+    private string _copy;
+    private BulmaForm<UpdateClientViewModel> _form;
+    private FormViewMode _formMode = FormViewMode.Readonly;
     private FormModel<UpdateClientViewModel> _formModel;
+    private bool _isLoading;
+    private bool _isNotificationVisible;
+    private NotificationDto _notification;
 
     [Parameter]
     public int ClientId { get; set; }
@@ -56,6 +91,7 @@
             },
             AllowedIps = client.AllowedIps
         };
+        _copy = JsonSerializer.Serialize(client);
 
         _formModel = new FormBuilder<UpdateClientViewModel>()
             .Input(x => x.Client.Name).WithIcon("user")
@@ -70,5 +106,69 @@
     private async Task HandleClose()
     {
         await OnClose.InvokeAsync(false);
+    }
+
+    private async Task Revoke()
+    {
+        _isLoading = true;
+
+        var client = _formModel.DataModel.Client;
+        client.IsRevoked = true;
+
+        await ClientService.Update(ClientId, client);
+        await OnClose.InvokeAsync(true);
+    }
+
+    private async Task SaveChanges()
+    {
+        // Validate model
+        var model = _formModel.DataModel;
+        var result = Validator.Validate(model);
+
+        if (!result.IsValid)
+        {
+            // Show validation message
+            _form.Validate();
+            _notification = new NotificationDto
+            {
+                Icon = "exclamation-triangle",
+                IconCss = "has-text-warning",
+                Message = "Please fill the required fields in the form below.",
+                Severity = "danger"
+            };
+            _isNotificationVisible = true;
+            return;
+        }
+
+        _formMode = FormViewMode.Readonly;
+        _isLoading = true;
+        var updated = false;
+
+        // Dirty check
+        var copy = JsonSerializer.Deserialize<UpdateClientViewModel>(_copy);
+        var isDirty = IsDirty(model.Client, copy.Client);
+
+        if (isDirty)
+        {
+            // Update
+            await ClientService.Update(ClientId, model.Client);
+            updated = true;
+        }
+
+        if(!model.AllowedIps.SequenceEqual(copy.AllowedIps))
+        {
+            await NetworkAddressService.ProcessNetworkAddresses(ClientService, ClientId, model.AllowedIps, copy.AllowedIps);
+            updated = true;
+        }
+
+        await OnClose.InvokeAsync(updated);
+    }
+
+    private bool IsDirty(UpdateClientDto model, UpdateClientDto copy)
+    {
+        return !(model.Name.Equals(copy.Name)
+            && model.Description.Equals(copy.Description)
+            && model.AssignedIp.Equals(copy.AssignedIp)
+            && model.PublicKey.Equals(copy.PublicKey));
     }
 }

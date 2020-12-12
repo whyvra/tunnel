@@ -17,7 +17,8 @@
 }
 else if (_formModel != null)
 {
-    <Modal Icon="user" Title="Client" IconCss="has-text-info" OnClose="HandleClose">
+    <Modal Icon="@(_isRevoked ? "user-slash" : "user")" Title="Client" IconCss="has-text-info"
+        OnClose="HandleClose">
         <ChildContent>
             @if (_isNotificationVisible)
             {
@@ -44,12 +45,24 @@ else if (_formModel != null)
                     <span>Save changes</span>
                 </button>
             }
-            <button class="button is-danger" disabled="@(_formMode == FormViewMode.Edit)" @onclick="Revoke">
-                <span class="icon">
-                    <i class="fas fa-ban"></i>
-                </span>
-                <span>Revoke</span>
-            </button>
+            @if (!_isRevoked)
+            {
+                <button class="button is-danger" disabled="@(_formMode == FormViewMode.Edit)" @onclick="Revoke">
+                    <span class="icon">
+                        <i class="fas fa-ban"></i>
+                    </span>
+                    <span>Revoke</span>
+                </button>
+            }
+            else
+            {
+                <button class="button is-primary" disabled="@(_formMode == FormViewMode.Edit)" @onclick="Reinstate">
+                    <span class="icon">
+                        <i class="fas fa-gavel"></i>
+                    </span>
+                    <span>Reinstate</span>
+                </button>
+            }
             <button class="button" @onclick="HandleClose">
                 <span class="icon">
                     <i class="fas fa-times"></i>
@@ -68,6 +81,7 @@ else if (_formModel != null)
     private FormModel<UpdateClientViewModel> _formModel;
     private bool _isLoading;
     private bool _isNotificationVisible;
+    private bool _isRevoked;
     private NotificationDto _notification;
 
     [Parameter]
@@ -79,6 +93,19 @@ else if (_formModel != null)
     protected override async Task OnInitializedAsync()
     {
         var client = await ClientService.Get(ClientId);
+        _isRevoked = client.IsRevoked ?? false;
+
+        if (_isRevoked)
+        {
+            _notification = new NotificationDto
+            {
+                Icon = "exclamation-triangle",
+                IconCss = "has-text-warning",
+                Message = "User has been revoked.",
+                Severity = "danger"
+            };
+            _isNotificationVisible = true;
+        }
 
         var viewModel = new UpdateClientViewModel
         {
@@ -87,6 +114,7 @@ else if (_formModel != null)
                 Name = client.Name,
                 Description = client.Description,
                 AssignedIp = client.AssignedIp,
+                IsRevoked = client.IsRevoked,
                 PublicKey = client.PublicKey
             },
             AllowedIps = client.AllowedIps
@@ -106,6 +134,17 @@ else if (_formModel != null)
     private async Task HandleClose()
     {
         await OnClose.InvokeAsync(false);
+    }
+
+    private async Task Reinstate()
+    {
+        _isLoading = true;
+
+        var client = _formModel.DataModel.Client;
+        client.IsRevoked = false;
+
+        await ClientService.Update(ClientId, client);
+        await OnClose.InvokeAsync(true);
     }
 
     private async Task Revoke()

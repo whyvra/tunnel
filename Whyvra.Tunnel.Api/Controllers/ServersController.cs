@@ -102,6 +102,20 @@ namespace Whyvra.Tunnel.Api.Controllers
         }
 
         /// <summary>
+        /// Get a list of revoked clients for the server
+        /// </summary>
+        /// <response code="201">Created</response>
+        [HttpGet("{id}/clients/revoked")]
+        [ProducesResponseType(200)]
+        public async Task<IActionResult> GetRevoked(int id, CancellationToken cancellationToken)
+        {
+            var query = new GetRevokedClientsForServerQuery { Id = id };
+            var clients = await Mediator.Send(query, cancellationToken);
+
+            return new JsonResult(clients);
+        }
+
+        /// <summary>
         /// Add a network address to a WireGuard server's default allowed range
         /// </summary>
         /// <response code="201">Created</response>

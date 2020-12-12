@@ -24,12 +24,25 @@
             </span>
             <span>Show server config</span>
         </button>
-        <button class="button is-danger">
-            <span class="icon">
-                <i class="fas fa-ban"></i>
-            </span>
-            <span>Show revoked</span>
-        </button>
+        @if (!_isRevokedShowing)
+        {
+            <button class="button is-danger" @onclick="GetRevoked">
+                <span class="icon">
+                    <i class="fas fa-ban"></i>
+                </span>
+                <span>Show revoked</span>
+            </button>
+        }
+        else
+        {
+            <button class="button" @onclick="HideRevoked">
+                <span class="icon">
+                    <i class="fas fa-minus-circle"></i>
+                </span>
+                <span>Hide revoked</span>
+            </button>
+        }
+        
     </div>
     <div class="level is-mobile" style="padding-top: 1.5em;">
         <div class="level-left">
@@ -49,14 +62,23 @@
 
     <div class="tile is-ancestor" style="flex-wrap: wrap;">
     @foreach (var client in _server.Clients)
-        {
-            <div class="tile is-parent is-4 serverbox" @onclick="@(() => ShowClient(client.Id))">
-                <article class="tile is-child box">
-                    <p class="title">@client.Name</p>
-                    <p class="subtitle">@client.Description</p>
-                </article>
-            </div>
-        }
+    {
+        <div class="tile is-parent is-4 serverbox" @onclick="@(() => ShowClient(client.Id))">
+            <article class="tile is-child box">
+                <p class="title">@client.Name</p>
+                <p class="subtitle">@client.Description</p>
+            </article>
+        </div>
+    }
+    @foreach (var client in _revoked)
+    {
+        <div class="tile is-parent is-4 serverbox" @onclick="@(() => ShowClient(client.Id))">
+            <article class="tile is-child box notification is-danger">
+                <p class="title">@client.Name</p>
+                <p class="subtitle">@client.Description</p>
+            </article>
+        </div>
+    }
     </div>
 
     @if (_showPopup)
@@ -75,8 +97,10 @@
 @code
 {
     private int? _clientId = null;
+    private bool _isRevokedShowing;
     private bool _showPopup = false;
     private ServerDto _server;
+    private IEnumerable<ClientDto> _revoked = Enumerable.Empty<ClientDto>();
 
     [Parameter]
     public string ServerId { get; set; }
@@ -89,9 +113,29 @@
 
     private async Task ClosePopup(bool wasUpdated)
     {
-        if (wasUpdated) _server = await ServerService.Get(int.Parse(ServerId));
+        if (wasUpdated) 
+        {
+            var id = int.Parse(ServerId);
+            _server = await ServerService.Get(id);
+            if (_isRevokedShowing)
+            {
+                _revoked = await ServerService.GetRevokedClients(id);
+            }
+        }
         _showPopup = false;
         _clientId = null;
+    }
+    
+    private async Task GetRevoked()
+    {
+        _revoked = await ServerService.GetRevokedClients(int.Parse(ServerId));
+        _isRevokedShowing = true;
+    }
+
+    private void HideRevoked()
+    {
+        _revoked = Enumerable.Empty<ClientDto>();
+        _isRevokedShowing = false;
     }
 
     private void ShowClient(int id)

@@ -291,6 +291,10 @@ namespace Whyvra.Tunnel.Data.Sqlite.Migrations
                         .IsRequired()
                         .HasColumnType("TEXT");
 
+                    b.Property<int>("ListenPort")
+                        .IsRequired()
+                        .HasColumnType("INTEGER");
+
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasColumnType("TEXT")

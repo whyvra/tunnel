@@ -26,6 +26,7 @@ namespace Whyvra.Tunnel.Core.Servers.Commands
                 AssignedRange = command.Data.AssignedRange.ToAddress(),
                 Dns = IPAddress.Parse(command.Data.Dns),
                 Endpoint = command.Data.Endpoint,
+                ListenPort = command.Data.ListenPort,
                 PublicKey = command.Data.PublicKey
             };
 

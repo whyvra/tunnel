@@ -21,6 +21,8 @@ namespace Whyvra.Tunnel.Common.Models
 
         public string Endpoint { get; set; }
 
+        public int ListenPort { get; set; }
+
         public string PublicKey { get; set; }
 
         public DateTime? CreatedAt { get; set; }

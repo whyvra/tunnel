@@ -55,6 +55,7 @@ namespace Whyvra.Tunnel.Presentation.Shared
                 .TagsInput(x => x.DefaultAllowedRange).WithDefaultEmptyValue("No IP range has been assigned")
                 .Input(x => x.Server.Dns).WithText("DNS").WithIcon("address-book")
                 .Input(x => x.Server.Endpoint).WithIcon("globe")
+                .Number(x => x.Server.ListenPort).WithText("Port to listen").WithIcon("ethernet")
                 .Input(x => x.Server.PublicKey).WithIcon("key");
 
             if (ServerId.HasValue)
@@ -74,6 +75,7 @@ namespace Whyvra.Tunnel.Presentation.Shared
                         AssignedRange = _server.AssignedRange,
                         Dns = _server.Dns,
                         Endpoint = _server.Endpoint,
+                        ListenPort = _server.ListenPort,
                         PublicKey = _server.PublicKey
                     },
                     DefaultAllowedRange = _server.DefaultAllowedRange
@@ -128,7 +130,6 @@ namespace Whyvra.Tunnel.Presentation.Shared
                 }
 
                 // Trigger modal close
-                //IsLoading = false;
                 await CloseAction.InvokeAsync(wasUpdated);
             }
         }
@@ -172,6 +173,7 @@ namespace Whyvra.Tunnel.Presentation.Shared
                 && server.AssignedRange.Equals(original.AssignedRange)
                 && server.Dns.Equals(original.Dns)
                 && server.Endpoint.Equals(original.Endpoint)
+                && server.ListenPort == original.ListenPort
                 && server.PublicKey.Equals(original.PublicKey));
         }
     }

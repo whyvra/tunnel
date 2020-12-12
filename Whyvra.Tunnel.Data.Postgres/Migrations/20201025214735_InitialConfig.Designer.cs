@@ -300,6 +300,10 @@ namespace Whyvra.Tunnel.Data.Postgres.Migrations
                         .IsRequired()
                         .HasColumnType("text");
 
+                    b.Property<int>("ListenPort")
+                        .IsRequired()
+                        .HasColumnType("integer");
+
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasColumnType("character varying(64)")

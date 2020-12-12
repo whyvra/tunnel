@@ -34,6 +34,7 @@ namespace Whyvra.Tunnel.Data.Postgres.Migrations
                     AssignedRange = table.Column<ValueTuple<IPAddress, int>>(nullable: false),
                     Dns = table.Column<IPAddress>(nullable: false),
                     Endpoint = table.Column<string>(nullable: false),
+                    ListenPort = table.Column<int>(nullable: false),
                     PublicKey = table.Column<string>(maxLength: 44, nullable: false),
                     CreatedAt = table.Column<DateTime>(nullable: false),
                     UpdatedAt = table.Column<DateTime>(nullable: false)

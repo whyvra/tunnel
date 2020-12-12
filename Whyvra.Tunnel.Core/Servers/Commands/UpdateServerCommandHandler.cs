@@ -33,6 +33,7 @@ namespace Whyvra.Tunnel.Core.Servers.Commands
             server.AssignedRange = command.Data.AssignedRange.ToAddress();
             server.Dns = IPAddress.Parse(command.Data.Dns);
             server.Endpoint = command.Data.Endpoint;
+            server.ListenPort = command.Data.ListenPort;
             server.PublicKey = command.Data.PublicKey;
 
             // Save changes

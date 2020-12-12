@@ -42,6 +42,7 @@ namespace Whyvra.Tunnel.Core.Servers.Queries
                         .ToList(),
                     Dns = x.Dns.ToString(),
                     Endpoint = x.Endpoint,
+                    ListenPort = x.ListenPort,
                     PublicKey = x.PublicKey,
                     CreatedAt = x.CreatedAt,
                     UpdatedAt = x.UpdatedAt

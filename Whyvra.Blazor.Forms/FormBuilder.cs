@@ -113,6 +113,29 @@ namespace Whyvra.Blazor.Forms
             return this;
         }
 
+        public FormBuilder<TModel> Number<TProperty>(Expression<Func<TModel, TProperty>> propertyLambda)
+        {
+            var member = propertyLambda.Body as MemberExpression;
+            var propertyInfo = member.Member as PropertyInfo;
+            var name = propertyInfo.Name;
+
+            var exprPath = propertyLambda.ToString();
+
+            var number = new Number
+            {
+                Name = name,
+                DisplayName = AddSpaces(name),
+                Getter = propertyLambda.GetGetter(),
+                Setter = propertyLambda.GetSetter(),
+                ValidationPath = exprPath.Substring(exprPath.IndexOf('.') + 1)
+            };
+
+            _activeField = name;
+            _fields.Add(name, number);
+
+            return this;
+        }
+
         public FormBuilder<TModel> OnChange(AsyncEventHandler<ChangeEventArgs> onChangeAsyncHandler)
         {
             var field = _fields[_activeField];

@@ -42,6 +42,11 @@ namespace Whyvra.Tunnel.Common.Models.Validation
                 })
                 .WithMessage("{PropertyName} is not a valid address, please specify <IPAddress or domain>:<port>.");
 
+            RuleFor(x => x.ListenPort)
+                .GreaterThanOrEqualTo(0)
+                .LessThanOrEqualTo(65535)
+                .WithMessage("{PropertyName} must be a valid port between 0 and 65535.");
+
             RuleFor(x => x.PublicKey)
                 .Length(44)
                 .NotEmpty()

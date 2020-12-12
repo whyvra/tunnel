@@ -58,6 +58,28 @@
                 </div>
             </div>
         }
+        else if (field is Number number)
+        {
+            <div class="field">
+                <label for="@(field.Name)">@(field.DisplayName)</label>
+                <p class="control @(field.Icon != null ? "has-icons-left" : "")">
+                    <input id="@(field.Name)" class="input @(FormViewMode == FormViewMode.Readonly ? "is-static" : "")" type="number"
+                        placeholder="@(field.DisplayName)" value="@(field.Getter(FormModel.DataModel))"
+                        @onchange="@((e) => HandleNumber(number, e))" readonly="@(FormViewMode == FormViewMode.Readonly)"
+                        @onfocusout="@(() => TriggerValidation(field))" >
+                    @if (field.Icon != null)
+                    {
+                        <span class="icon is-left">
+                            <i class="fas fa-@(field.Icon)"></i>
+                        </span>
+                    }
+                    @if (_isValidationEnabled)
+                    {
+                        <ValidationMessage Messages="@field.ValidationMessages" />
+                    }
+                </p>
+            </div>
+        }
         else {
             <div class="field">
                 <label for="@(field.Name)">@(field.DisplayName)</label>
@@ -167,6 +189,15 @@
 
         // Wait for async handlers to complete
         await asyncHandler;
+    }
+
+    private void HandleNumber(Number number, ChangeEventArgs e)
+    {
+        var input = e.Value.ToString().Trim();
+        if (!string.IsNullOrWhiteSpace(input))
+        {
+            number.Setter(FormModel.DataModel, int.Parse(input));
+        }
     }
 
     private void TriggerValidation(Input field)

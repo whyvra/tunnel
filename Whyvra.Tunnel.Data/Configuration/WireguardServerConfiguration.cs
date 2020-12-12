@@ -27,6 +27,9 @@ namespace Whyvra.Tunnel.Data.Configuration
             builder.Property(x => x.Endpoint)
                 .IsRequired();
 
+            builder.Property(x => x.ListenPort)
+                .IsRequired();
+
             builder.Property(x => x.PublicKey)
                 .HasMaxLength(44)
                 .IsRequired();

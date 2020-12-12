@@ -30,6 +30,7 @@ namespace Whyvra.Tunnel.Data.Sqlite.Migrations
                     AssignedRange = table.Column<string>(nullable: false),
                     Dns = table.Column<string>(nullable: false),
                     Endpoint = table.Column<string>(nullable: false),
+                    ListenPort = table.Column<int>(nullable: false),
                     PublicKey = table.Column<string>(maxLength: 44, nullable: false),
                     CreatedAt = table.Column<DateTime>(nullable: false),
                     UpdatedAt = table.Column<DateTime>(nullable: false)

@@ -84,6 +84,20 @@ namespace Whyvra.Tunnel.Api.Controllers
             return NoContent();
         }
 
+         /// <summary>
+        /// Get a list of the server's active clients
+        /// </summary>
+        /// <response code="204">NoContent</response>
+        [HttpGet("{id}/clients")]
+        [ProducesResponseType(200)]
+        public async Task<IActionResult> GetClients(int id, CancellationToken cancellationToken)
+        {
+            var query = new GetServerClientsQuery {Id = id};
+            var clients = await Mediator.Send(query, cancellationToken);
+
+            return new JsonResult(clients);
+        }
+
         /// <summary>
         /// Create a new client for a WireGuard server
         /// </summary>
@@ -104,7 +118,7 @@ namespace Whyvra.Tunnel.Api.Controllers
         /// <summary>
         /// Get a list of revoked clients for the server
         /// </summary>
-        /// <response code="201">Created</response>
+        /// <response code="200">OK</response>
         [HttpGet("{id}/clients/revoked")]
         [ProducesResponseType(200)]
         public async Task<IActionResult> GetRevoked(int id, CancellationToken cancellationToken)

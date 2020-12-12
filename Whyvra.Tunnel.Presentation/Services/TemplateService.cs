@@ -1,4 +1,6 @@
+using System.Collections.Generic;
 using Bunit;
+using Whyvra.Tunnel.Common.Models;
 using Whyvra.Tunnel.Presentation.Templates;
 using Whyvra.Tunnel.Presentation.ViewModels;
 
@@ -19,6 +21,14 @@ namespace Whyvra.Tunnel.Presentation.Services
             var component = _context.RenderComponent<ClientConfiguration>(parameter);
 
             return component.Markup;
+        }
+
+        public string RenderServerConfiguration(ServerDto server, IEnumerable<ClientDto> clients)
+        {
+            var serverParameter = ComponentParameterFactory.Parameter("Server", server);
+            var clientsParameter = ComponentParameterFactory.Parameter("Clients", clients);
+            var component = _context.RenderComponent<ServerConfiguration>(serverParameter, clientsParameter);
+            return component.Markup.Trim();
         }
     }
 }

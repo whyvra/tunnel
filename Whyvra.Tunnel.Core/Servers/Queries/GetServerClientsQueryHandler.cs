@@ -9,26 +9,27 @@ using Whyvra.Tunnel.Data;
 
 namespace Whyvra.Tunnel.Core.Servers.Queries
 {
-    public class GetRevokedClientsForServerQueryHandler : IRequestHandler<GetRevokedClientsForServerQuery, IEnumerable<ClientDto>>
+    public class GetServerClientsQueryHandler : IRequestHandler<GetServerClientsQuery, IEnumerable<ClientDto>>
     {
         private readonly ITunnelContext _context;
 
-        public GetRevokedClientsForServerQueryHandler(ITunnelContext context)
+        public GetServerClientsQueryHandler(ITunnelContext context)
         {
             _context = context;
         }
 
-        public async Task<IEnumerable<ClientDto>> Handle(GetRevokedClientsForServerQuery query, CancellationToken cancellationToken)
+        public async Task<IEnumerable<ClientDto>> Handle(GetServerClientsQuery query, CancellationToken cancellationToken)
         {
             return await _context.Clients
                 .AsNoTracking()
-                .Where(x => x.ServerId == query.Id && x.IsRevoked)
+                .Where(x => !x.IsRevoked && x.ServerId == query.Id)
                 .Select(x => new ClientDto
                 {
                     Id = x.Id,
                     Name = x.Name,
                     Description = x.Description,
-                    IsRevoked = x.IsRevoked
+                    AssignedIp = $"{x.AssignedIp.addr}/{x.AssignedIp.cidr}",
+                    PublicKey = x.PublicKey
                 })
                 .ToListAsync(cancellationToken);
         }

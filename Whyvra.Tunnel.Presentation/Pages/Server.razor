@@ -1,4 +1,6 @@
+@inject IJSRuntime js
 @inject ServerService ServerService
+@inject TemplateService TemplateService
 
 @page "/servers/{ServerId}"
 
@@ -18,7 +20,7 @@
         </div>
     </article>
     <div class="buttons" style="padding-top: 1.5em;">
-        <button class="button is-primary">
+        <button class="button is-primary" @onclick="ShowServerConfig">
             <span class="icon">
                 <i class="fas fa-file"></i>
             </span>
@@ -81,7 +83,16 @@
     }
     </div>
 
-    @if (_showPopup)
+    @if (_isLoading)
+    {
+        <div class="modal is-active">
+            <div class="modal-background"></div>
+            <div class="modal-content modal-loader">
+                <button class="button is-loading is-large"></button>
+            </div>
+        </div>
+    }
+    else if (_showPopup)
     {
         @if (_clientId.HasValue)
         {
@@ -92,13 +103,46 @@
             <NewClientForm CloseAction="ClosePopup" ServerDto="@_server"></NewClientForm>
         }
     }
+    else if (_showServerConfig)
+    {
+        <Modal Icon="server" IconCss="has-text-info" Title="Server configuration" OnClose="@(() => _showServerConfig = false)">
+            <ChildContent>
+                @if (_isNotificationVisible)
+                {
+                    <Notification NotificationDto="@_notification" OnClose="@(() => _isNotificationVisible = false)"></Notification>
+                }
+                <pre class="codeblock">
+                    <code class="language-ini">@_serverConfig</code>
+                </pre>
+            </ChildContent>
+            <Buttons>
+                <button class="button is-success" @onclick="CopyToClipboard">
+                    <span class="icon">
+                        <i class="fas fa-copy"></i>
+                    </span>
+                    <span>Copy to clipboard</span>
+                </button>
+                <button class="button" @onclick="@(() => _showServerConfig = false)">
+                    <span class="icon">
+                        <i class="fas fa-times"></i>
+                    </span>
+                    <span>Close</span>
+                </button>
+            </Buttons>
+        </Modal>
+    }
 }
 
 @code
 {
     private int? _clientId = null;
+    private bool _isLoading;
+    private bool _isNotificationVisible;
     private bool _isRevokedShowing;
-    private bool _showPopup = false;
+    private NotificationDto _notification;
+    private string _serverConfig;
+    private bool _showPopup;
+    private bool _showServerConfig;
     private ServerDto _server;
     private IEnumerable<ClientDto> _revoked = Enumerable.Empty<ClientDto>();
 
@@ -109,6 +153,14 @@
     {
         var id = int.Parse(ServerId);
         _server = await ServerService.Get(id);
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (_showServerConfig)
+        {
+            await js.InvokeVoidAsync("HighlightService.trigger");
+        }
     }
 
     private async Task ClosePopup(bool wasUpdated)
@@ -124,6 +176,18 @@
         }
         _showPopup = false;
         _clientId = null;
+    }
+
+    private async Task CopyToClipboard()
+    {
+        await js.InvokeVoidAsync("clipboardCopy.copyText", _serverConfig);
+        _notification = new NotificationDto
+        {
+            Icon = "paste",
+            Message = "Copied to clipboard! Don't forget to swap the server's private key.",
+            Severity = "info"
+        };
+        _isNotificationVisible = true;
     }
     
     private async Task GetRevoked()
@@ -142,5 +206,14 @@
     {
         _clientId = id;
         _showPopup = true;
+    }
+
+    private async Task ShowServerConfig()
+    {
+        _isLoading = true;
+        var clients = await ServerService.GetClients(int.Parse(ServerId));
+        _serverConfig = TemplateService.RenderServerConfiguration(_server, clients);
+        _showServerConfig = true;
+        _isLoading = false;
     }
 }

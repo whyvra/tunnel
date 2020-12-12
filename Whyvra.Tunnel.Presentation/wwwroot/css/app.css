@@ -157,3 +157,8 @@ html {
 .is-shrinkable .level-right .level-item {
     flex-shrink: 1;
 }
+
+.codeblock {
+    white-space: pre-line;
+    padding: 0;
+}

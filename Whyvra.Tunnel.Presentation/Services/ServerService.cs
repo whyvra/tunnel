@@ -50,6 +50,11 @@ namespace Whyvra.Tunnel.Presentation.Services
             return await _http.GetFromJsonAsync<IEnumerable<ServerDto>>($"{_api.Url}/servers");
         }
 
+        public async Task<IEnumerable<ClientDto>> GetClients(int id)
+        {
+            return await _http.GetFromJsonAsync<IEnumerable<ClientDto>>($"{_api.Url}/servers/{id}/clients");
+        }
+
         public async Task<IEnumerable<ClientDto>> GetRevokedClients(int id)
         {
             return await _http.GetFromJsonAsync<IEnumerable<ClientDto>>($"{_api.Url}/servers/{id}/clients/revoked");

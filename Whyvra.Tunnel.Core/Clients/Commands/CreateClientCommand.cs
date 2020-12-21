@@ -5,7 +5,7 @@ namespace Whyvra.Tunnel.Core.Clients.Commands
 {
     public class CreateClientCommand : IRequest<int>
     {
-        public CreateUpdateClientDto Client { get; set; }
+        public CreateClientDto Client { get; set; }
 
         public int ServerId { get; set; }
     }

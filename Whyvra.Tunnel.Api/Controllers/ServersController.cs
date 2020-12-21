@@ -104,7 +104,7 @@ namespace Whyvra.Tunnel.Api.Controllers
         /// <response code="201">Created</response>
         [HttpPost("{id}/clients")]
         [ProducesResponseType(201)]
-        public async Task<IActionResult> Post(int id, [FromBody] CreateUpdateClientDto client, CancellationToken cancellationToken)
+        public async Task<IActionResult> Post(int id, [FromBody] CreateClientDto client, CancellationToken cancellationToken)
         {
             var command = new CreateClientCommand {Client = client, ServerId = id};
             var clientId = await Mediator.Send(command, cancellationToken);

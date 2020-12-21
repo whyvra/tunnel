@@ -8,6 +8,15 @@ namespace Whyvra.Tunnel.Common.Validation
 {
     public static class ValidationExtensions
     {
+        public static bool HasNoBitsRightOfNetmask(this string addr)
+        {
+            if(string.IsNullOrWhiteSpace(addr)) return false;
+            var chunks = addr.Split('/');
+            var network = IPNetwork.Parse(addr);
+
+            return network.Network.ToString().Equals(chunks[0]);
+        }
+
         public static bool IsAllDigits(this string str)
         {
             if(string.IsNullOrWhiteSpace(str)) return false;

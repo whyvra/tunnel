@@ -19,7 +19,9 @@ namespace Whyvra.Tunnel.Common.Models.Validation
                 .NotNull()
                 .NotEmpty()
                 .Must(x => x.IsIPAddressWithCidr())
-                .WithMessage("{PropertyName} must be a valid IPv4 or IPv6 address in CIDR notation.");
+                .WithMessage("{PropertyName} must be a valid IPv4 or IPv6 address in CIDR notation.")
+                .Must(x => x.HasNoBitsRightOfNetmask())
+                .WithMessage("{PropertyName} has bits set to the right of the netmask.");
 
             RuleFor(x => x.PublicKey)
                 .Length(44)

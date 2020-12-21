@@ -1,6 +1,6 @@
 namespace Whyvra.Tunnel.Common.Models
 {
-    public class CreateUpdateClientDto
+    public class CreateClientDto
     {
         public string Name { get; set; }
 

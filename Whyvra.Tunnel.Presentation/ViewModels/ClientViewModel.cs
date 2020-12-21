@@ -3,9 +3,9 @@ using Whyvra.Tunnel.Common.Models;
 
 namespace Whyvra.Tunnel.Presentation.ViewModels
 {
-    public class ClientViewModel
+    public class ClientViewModel : IClientViewModel<CreateClientDto>
     {
-        public CreateUpdateClientDto Client { get; set; } = new CreateUpdateClientDto();
+        public CreateClientDto Client { get; set; } = new CreateClientDto();
 
         public IEnumerable<string> AllowedIps { get; set; } = new List<string>();
     }

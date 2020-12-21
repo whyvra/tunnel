@@ -24,7 +24,7 @@ namespace Whyvra.Tunnel.Presentation.Services
             result.EnsureSuccessStatusCode();
         }
 
-        public async Task<int> CreateNew(int serverId, CreateUpdateClientDto client)
+        public async Task<int> CreateNew(int serverId, CreateClientDto client)
         {
             var result = await _http.PostAsJsonAsync($"{_api.Url}/servers/{serverId}/clients", client);
             result.EnsureSuccessStatusCode();

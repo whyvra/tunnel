@@ -1,13 +1,12 @@
 using System.Linq;
 using FluentValidation;
-using Whyvra.Tunnel.Common.Models;
 using Whyvra.Tunnel.Common.Validation;
 
 namespace Whyvra.Tunnel.Presentation.ViewModels
 {
-    public class ClientViewModelValidator : AbstractValidator<ClientViewModel>
+    public class ClientViewModelValidator<TModel, TBase> : AbstractValidator<TModel> where TModel : IClientViewModel<TBase>
     {
-        public ClientViewModelValidator(IValidator<CreateUpdateClientDto> childValidator)
+        public ClientViewModelValidator(IValidator<TBase> childValidator)
         {
             RuleFor(x => x.Client).SetValidator(childValidator);
 
@@ -17,7 +16,9 @@ namespace Whyvra.Tunnel.Presentation.ViewModels
 
             RuleFor(x => x.AllowedIps)
                 .Must(x => x.All(x => x.IsIPAddressWithCidr()))
-                .WithMessage("All addresses must be valid IPv4 or IPv6 address in CIDR notation.");
+                .WithMessage("All addresses must be valid IPv4 or IPv6 address in CIDR notation.")
+                .Must(x => x.All(x => x.HasNoBitsRightOfNetmask()))
+                .WithMessage("One or more addresses has bits set to the right of the netmask.");
         }
     }
 }

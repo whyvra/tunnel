@@ -3,7 +3,7 @@ using Whyvra.Tunnel.Common.Models;
 
 namespace Whyvra.Tunnel.Presentation.ViewModels
 {
-    public class UpdateClientViewModel
+    public class UpdateClientViewModel : IClientViewModel<UpdateClientDto>
     {
         public UpdateClientDto Client { get; set; } = new UpdateClientDto();
 

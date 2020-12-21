@@ -10,6 +10,7 @@
 
   <ItemGroup>
     <PackageReference Include="FluentValidation" Version="9.2.2" />
+    <PackageReference Include="IPNetwork2" Version="2.5.240" />
     <PackageReference Include="MediatR" Version="9.0.0" />
   </ItemGroup>
 

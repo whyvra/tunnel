@@ -8,6 +8,8 @@ namespace Whyvra.Tunnel.Api.Authentication
 
         public string Issuer { get; set; }
 
+        public string RequiredRole { get; set; }
+
         public string WellKnownEndpoint { get; set; }
     }
 }

@@ -2,30 +2,9 @@
 
 @inherits LayoutComponentBase
 
-@inject NavigationManager NavigationManager
-@inject IOptions<AuthenticationOptions> Auth
-@inject IServiceProvider Services
-
 <NavBar />
 <section class="section">
     <div class="container">
         @Body
     </div>
 </section>
-
-@code
-{
-    protected override async Task OnInitializedAsync()
-    {
-        if (Auth.Value.Enabled)
-        {
-            var provider = Services.GetService<AuthenticationStateProvider>();
-            var state = await provider.GetAuthenticationStateAsync();
-
-            if (!state.User.Identity.IsAuthenticated)
-            {
-                NavigationManager.NavigateTo("/");
-            }
-        }
-    }
-}

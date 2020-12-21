@@ -14,7 +14,7 @@ html {
     padding: 3rem 2rem 3rem 2rem;
 }
 
-.jumbotron > .banner {
+.jumbotron .banner {
     align-items: center;
     display: flex;
     overflow: hidden;

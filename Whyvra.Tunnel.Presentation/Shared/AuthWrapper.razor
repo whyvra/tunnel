@@ -4,7 +4,7 @@
 
 @if(Auth.Value.Enabled)
 {
-<AuthorizeView>
+<AuthorizeView Policy="WireGuard">
     <Authorized>
         @ChildContent
     </Authorized>

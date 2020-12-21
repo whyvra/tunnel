@@ -1,6 +1,10 @@
 using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text.Json;
 using Bunit;
 using FluentValidation;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Components.WebAssembly.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -44,6 +48,28 @@ namespace Whyvra.Tunnel.Presentation
 
                 // Add authorization handler if authentication is enabled
                 apiClient.AddHttpMessageHandler<CustomAuthorizationMessageHandler>();
+
+                // Check if role is specified
+                var role = builder.Configuration.GetValue<string>("auth:requiredRole");
+                var policy = new AuthorizationPolicyBuilder()
+                    .RequireAuthenticatedUser();
+
+                if (!string.IsNullOrWhiteSpace(role))
+                {
+                    // Require user to have claim with role
+                    policy.RequireAssertion(x => {
+                        var claim = x.User.Claims.SingleOrDefault(x => x.Type.Equals("roles"));
+                        if (claim != null) {
+                            var roles = JsonSerializer.Deserialize<IEnumerable<string>>(claim.Value);
+                            return roles.Contains(role);
+                        }
+
+                        return false;
+                    });
+                }
+
+                // Add policy which requires authenticated users and optionally a custom role claim
+                builder.Services.AddAuthorizationCore(x => x.AddPolicy("WireGuard", policy.Build()));
             }
 
             // Register service dependencies

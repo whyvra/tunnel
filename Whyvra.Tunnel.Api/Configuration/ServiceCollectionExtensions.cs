@@ -3,6 +3,7 @@ using System.IO;
 using System.Reflection;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.OpenApi.Models;
 using Whyvra.Tunnel.Api.Authentication;
@@ -41,6 +42,14 @@ namespace Whyvra.Tunnel.Api.Configuration
                             }
                         };
                     });
+
+                // Add a required role, if specified in appsettings
+                if (!string.IsNullOrWhiteSpace(opts.RequiredRole))
+                {
+                    services.AddAuthorization(x => x.DefaultPolicy = new AuthorizationPolicyBuilder()
+                        .RequireRole(opts.RequiredRole)
+                        .Build());
+                }
             }
 
             return services;

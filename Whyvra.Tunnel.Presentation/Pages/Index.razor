@@ -1,5 +1,8 @@
 @using Microsoft.Extensions.DependencyInjection
 
+@inject IServiceProvider Services
+@inject IOptions<AuthenticationOptions> Auth
+
 @page "/"
 
 <div class="jumbotron">
@@ -27,12 +30,27 @@
                 </NavLink>
             </ChildContent>
             <NotAuthorizedContent>
-                <NavLink class="button is-success" href="/authentication/login">
-                    <span class="icon">
-                        <i class="fas fa-sign-in-alt"></i>
-                    </span>
-                    <span>Login</span>
-                </NavLink>
+                @if (_userNotInRole)
+                {
+                    <div class="banner">
+                        <span class="icon is-medium has-text-danger">
+                            <i class="fas fa-times-circle fa-2x"></i>
+                        </span>
+                        <div style="padding-left: 1.5em;">
+                            <h4 class="title is-4">You don't have the required role to access this application.</h4>
+                            <p class="subtitle is-6">If this issue persists and you think this is an error, please contact your system administator.</p>
+                        </div>
+                    </div>
+                }
+                else
+                {
+                    <NavLink class="button is-success" href="/authentication/login">
+                        <span class="icon">
+                            <i class="fas fa-sign-in-alt"></i>
+                        </span>
+                        <span>Login</span>
+                    </NavLink>
+                }
             </NotAuthorizedContent>
         </AuthWrapper>
     </div>
@@ -57,6 +75,8 @@
 
 @code
 {
+    private bool _userNotInRole;
+
     struct Tile {
         public string Icon;
         public string Title;
@@ -71,4 +91,14 @@
         new Tile {Title = "Cross-platform", Icon = "desktop", Text = "Built with .NET Core which means Tunnel can run on any of the supported platforms including Windows, Linux and MacOS."},
         new Tile {Title = "Open Source", Icon = "code", Text = "The code for Tunnel is open-sourced and available publicly via Git. It is published under the MIT license."}
     };
+
+    protected override async Task OnInitializedAsync()
+    {
+        var provider = Services.GetService<AuthenticationStateProvider>();
+        var state = await provider.GetAuthenticationStateAsync();
+        var user = state.User;
+
+        var role = user.Claims.SingleOrDefault(x => x.Type.Equals("roles") && x.Value.Equals(Auth.Value.RequiredRole));
+        _userNotInRole = user.Identity.IsAuthenticated && role == null;
+    }
 }

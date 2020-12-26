@@ -1,5 +1,7 @@
+using System;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Hosting;
+using Serilog;
 
 namespace Whyvra.Tunnel.Api
 {
@@ -12,6 +14,13 @@ namespace Whyvra.Tunnel.Api
 
         public static IHostBuilder CreateHostBuilder(string[] args) =>
             Host.CreateDefaultBuilder(args)
-                .ConfigureWebHostDefaults(webBuilder => webBuilder.UseStartup<Startup>());
+                .ConfigureWebHostDefaults(webBuilder => webBuilder
+                    .UseSerilog((context, loggerConfiguration) =>
+                        loggerConfiguration
+                            .ReadFrom.Configuration(context.Configuration)
+                            .Enrich.WithProperty("MachineName", Environment.MachineName)
+                    )
+                    .UseStartup<Startup>()
+                );
     }
 }

@@ -15,17 +15,31 @@
     </button>
 </div>
 
-<div class="tile is-ancestor">
-    @foreach (var server in _servers)
-    {
-        <div class="tile is-parent is-4 serverbox" @onclick="@(() => Pop(server.Id))">
-            <article class="tile is-child box">
-                <p class="title">@server.Name</p>
-                <p class="subtitle">@server.Description</p>
-            </article>
+@if (_servers != null && _servers.Count() == 0)
+{
+    <div class="subtitle has-text-centered" style="padding-top: 1.5em;">
+        <div>
+            <span class="icon is-large">
+                <i class="fas fa-server fa-3x"></i>
+            </span>
         </div>
-    }
-</div>
+        Looks like there are no servers yet. Click the 'New server' button to get started.
+    </div>
+}
+else if (_servers != null)
+{
+    <div class="tile is-ancestor">
+        @foreach (var server in _servers)
+        {
+            <div class="tile is-parent is-4 serverbox" @onclick="@(() => Pop(server.Id))">
+                <article class="tile is-child box">
+                    <p class="title">@server.Name</p>
+                    <p class="subtitle">@server.Description</p>
+                </article>
+            </div>
+        }
+    </div>
+}
 
     @if (_showServerPopup)
     {
@@ -35,7 +49,7 @@
 @code
 {
     private bool _showServerPopup = false;
-    private IEnumerable<ServerDto> _servers = new ServerDto[0];
+    private IEnumerable<ServerDto> _servers = null;
     private int? _serverId = null;
 
     protected override async Task OnInitializedAsync()

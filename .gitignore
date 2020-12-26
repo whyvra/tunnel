@@ -237,3 +237,6 @@ _Pvt_Extensions
 
 # SQLite database
 *.sqlite3
+
+# .NET Core logging
+logs/

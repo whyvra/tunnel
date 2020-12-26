@@ -8,11 +8,13 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Components.WebAssembly.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
 using QRCoder;
 using Whyvra.Tunnel.Common.Models;
 using Whyvra.Tunnel.Common.Models.Validation;
 using Whyvra.Tunnel.Presentation.Authentication;
 using Whyvra.Tunnel.Presentation.Configuration;
+using Whyvra.Tunnel.Presentation.Logging;
 using Whyvra.Tunnel.Presentation.Services;
 using Whyvra.Tunnel.Presentation.ViewModels;
 
@@ -94,6 +96,12 @@ namespace Whyvra.Tunnel.Presentation
                 .AddScoped<IValidator<ClientViewModel>, ClientViewModelValidator<ClientViewModel, CreateClientDto>>()
                 .AddScoped<IValidator<ServerViewModel>, ServerViewModelValidator>()
                 .AddScoped<IValidator<UpdateClientViewModel>, ClientViewModelValidator<UpdateClientViewModel, UpdateClientDto>>();
+
+            // Setup logger to catch unhandled exception
+            var handler = new ExceptionHandler();
+            var provider = new ExceptionLoggerProvider(handler);
+            builder.Services.AddSingleton<IExceptionHandler>(handler);
+            builder.Logging.AddProvider(provider);
 
             return services;
         }

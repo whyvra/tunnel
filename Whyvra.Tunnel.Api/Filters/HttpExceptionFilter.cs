@@ -1,6 +1,7 @@
 using System;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
+using Whyvra.Tunnel.Common.Models;
 
 namespace Whyvra.Tunnel.Api.Filters
 {
@@ -10,19 +11,31 @@ namespace Whyvra.Tunnel.Api.Filters
         {
             if (context.Exception.GetType() == typeof(NullReferenceException))
             {
-                var error = new {message = context.Exception.Message, status = "Not Found", statusCode = 404};
+                var error = new ApiMessage {Message = context.Exception.Message, Status = "Not Found", StatusCode = 404};
                 context.Result = new JsonResult(error)
                 {
                     StatusCode = 404
                 };
             }
-
-            if (context.Exception.GetType() == typeof(ArgumentException))
+            else if (context.Exception.GetType() == typeof(ArgumentException))
             {
-                var error = new {message = context.Exception.Message, status = "Bad Request", statusCode = 400};
+                var error = new ApiMessage {Message = context.Exception.Message, Status = "Bad Request", StatusCode = 400};
                 context.Result = new JsonResult(error)
                 {
                     StatusCode = 400
+                };
+            }
+            else
+            {
+                var error = new ApiMessage {Message = context.Exception.Message, Status = "Inner Server Error", StatusCode = 500};
+                if (context.Exception.InnerException != null)
+                {
+                    error.InnerException = context.Exception.InnerException.Message;
+                }
+
+                context.Result = new JsonResult(error)
+                {
+                    StatusCode = 500
                 };
             }
         }

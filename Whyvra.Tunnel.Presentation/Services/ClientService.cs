@@ -21,13 +21,13 @@ namespace Whyvra.Tunnel.Presentation.Services
         public async Task AddNetworkAddress(int id, int networkAddressId)
         {
             var result = await _http.PutAsync($"{_api.Url}/clients/{id}/allowedips/{networkAddressId}", null);
-            result.EnsureSuccessStatusCode();
+            await result.EnsureSuccess();
         }
 
         public async Task<int> CreateNew(int serverId, CreateClientDto client)
         {
             var result = await _http.PostAsJsonAsync($"{_api.Url}/servers/{serverId}/clients", client);
-            result.EnsureSuccessStatusCode();
+            await result.EnsureSuccess();
 
             var response = await result.Content.ReadFromJsonAsync<IdResponse>();
             return response.Id;
@@ -35,19 +35,19 @@ namespace Whyvra.Tunnel.Presentation.Services
 
         public async Task<ClientDto> Get(int id)
         {
-            return await _http.GetFromJsonAsync<ClientDto>($"{_api.Url}/clients/{id}");
+            return await _http.GetFromJsonAsyncWithSuccess<ClientDto>($"{_api.Url}/clients/{id}");
         }
 
         public async Task RemoveNetworkAddress(int id, int networkAddressId)
         {
             var result = await _http.DeleteAsync($"{_api.Url}/clients/{id}/allowedips/{networkAddressId}");
-            result.EnsureSuccessStatusCode();
+            await result.EnsureSuccess();
         }
 
         public async Task Update(int id, UpdateClientDto client)
         {
             var result = await _http.PutAsJsonAsync($"{_api.Url}/clients/{id}", client);
-            result.EnsureSuccessStatusCode();
+            await result.EnsureSuccess();
         }
     }
 }

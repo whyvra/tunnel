@@ -36,7 +36,7 @@ namespace Whyvra.Tunnel.Core.Clients.Commands
 
                 var addresses = await _context.Clients
                     .AsNoTracking()
-                    .Where(x => x.ServerId == command.ServerId && !x.IsRevoked)
+                    .Where(x => x.ServerId == command.ServerId)
                     .Select(x => x.AssignedIp.addr)
                     .ToListAsync();
 

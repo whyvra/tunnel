@@ -1,3 +1,4 @@
+using System;
 using System.Linq;
 using System.Text.Json;
 using System.Threading.Tasks;
@@ -7,6 +8,8 @@ using Whyvra.Blazor.Forms;
 using Whyvra.Blazor.Forms.Renderer;
 using Whyvra.Tunnel.Common.Models;
 using Whyvra.Tunnel.Presentation.Components;
+using Whyvra.Tunnel.Presentation.Configuration;
+using Whyvra.Tunnel.Presentation.Logging;
 using Whyvra.Tunnel.Presentation.Services;
 using Whyvra.Tunnel.Presentation.ViewModels;
 
@@ -23,11 +26,13 @@ namespace Whyvra.Tunnel.Presentation.Shared
         public FormModel<ServerViewModel> FormModel { get; set; }
         public FormViewMode FormViewMode { get; set; } = FormViewMode.Readonly;
         public bool IsLoading { get; set; }
-        public bool IsNotificationVisible { get; set; }
-        public NotificationDto Notification { get; set; }
+        public NotificationDto Notification { get; set; } = new NotificationDto();
         public bool ShowDeleteConfirm { get; set; }
 
         // Injectable properties
+        [Inject]
+        public IExceptionHandler ExceptionHandler { get; set; }
+
         [Inject]
         protected IValidator<ServerViewModel> Validator { get; set;}
 
@@ -46,6 +51,8 @@ namespace Whyvra.Tunnel.Presentation.Shared
 
         protected override async Task OnInitializedAsync()
         {
+            ExceptionHandler.OnUnhandledException += HandleException;
+
             var fb = new FormBuilder<ServerViewModel>();
 
             fb
@@ -91,6 +98,20 @@ namespace Whyvra.Tunnel.Presentation.Shared
             FormModel = fb.Build();
         }
 
+        private void HandleException(object sender, Exception e)
+        {
+            IsLoading = false;
+            Notification = new NotificationDto
+            {
+                Icon = "exclamation-triangle",
+                IconCss = "has-text-warning",
+                Message = e is TunnelException te ? te.FormattedMessage : e.Message,
+                Severity = "danger"
+            };
+            Notification.IsVisible = true;
+            StateHasChanged();
+        }
+
         protected async Task SaveChanges()
         {
             // Check if model is valid
@@ -107,7 +128,7 @@ namespace Whyvra.Tunnel.Presentation.Shared
                     Message = "Please fill the required fields in the form below.",
                     Severity = "danger"
                 };
-                IsNotificationVisible = true;
+                Notification.IsVisible = true;
                 return;
             }
 

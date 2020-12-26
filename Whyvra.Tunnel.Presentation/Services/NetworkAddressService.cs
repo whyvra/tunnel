@@ -24,7 +24,7 @@ namespace Whyvra.Tunnel.Presentation.Services
         public async Task<int> CreateNew(CreateNetworkAddressCommand command)
         {
             var result = await _http.PostAsJsonAsync($"{_api.Url}/networkaddress", command);
-            result.EnsureSuccessStatusCode();
+            await result.EnsureSuccess();
 
             var response = await result.Content.ReadFromJsonAsync<IdResponse>();
 
@@ -33,7 +33,7 @@ namespace Whyvra.Tunnel.Presentation.Services
 
         public async Task<IEnumerable<NetworkAddressDto>> GetAll()
         {
-            return await _http.GetFromJsonAsync<IEnumerable<NetworkAddressDto>>($"{_api.Url}/networkaddress");
+            return await _http.GetFromJsonAsyncWithSuccess<IEnumerable<NetworkAddressDto>>($"{_api.Url}/networkaddress");
         }
 
         public async Task ProcessNetworkAddresses(INetworkEntityService service, int entityId, IEnumerable<string> newRange, IEnumerable<string> oldRange)

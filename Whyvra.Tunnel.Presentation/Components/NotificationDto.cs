@@ -6,6 +6,8 @@ namespace Whyvra.Tunnel.Presentation.Components
 
         public string IconCss { get; set; }
 
+        public bool IsVisible { get; set; }
+
         public string Message { get; set; }
 
         public string Severity { get; set; }

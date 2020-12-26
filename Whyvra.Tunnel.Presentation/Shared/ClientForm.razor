@@ -2,8 +2,11 @@
 @using FluentValidation
 @using Whyvra.Blazor.Forms.Renderer
 
+@implements IDisposable
+
 @inject ClientService ClientService
 @inject NetworkAddressService NetworkAddressService
+@inject IExceptionHandler ExceptionHandler
 @inject IValidator<UpdateClientViewModel> Validator
 
 @if (_isLoading)
@@ -20,9 +23,9 @@ else if (_formModel != null)
     <Modal Icon="@(_isRevoked ? "user-slash" : "user")" Title="Client" IconCss="has-text-info"
         OnClose="HandleClose">
         <ChildContent>
-            @if (_isNotificationVisible)
+            @if (_notification.IsVisible)
             {
-                <Notification NotificationDto="@_notification" OnClose="@(() => _isNotificationVisible = false)"></Notification>
+                <Notification NotificationDto="@_notification" OnClose="@(() => _notification.IsVisible = false)"></Notification>
             }
             <BulmaForm @ref="_form" FormModel="_formModel" FormViewMode="_formMode"></BulmaForm>
         </ChildContent>
@@ -80,9 +83,8 @@ else if (_formModel != null)
     private FormViewMode _formMode = FormViewMode.Readonly;
     private FormModel<UpdateClientViewModel> _formModel;
     private bool _isLoading;
-    private bool _isNotificationVisible;
     private bool _isRevoked;
-    private NotificationDto _notification;
+    private NotificationDto _notification = new NotificationDto();
 
     [Parameter]
     public int ClientId { get; set; }
@@ -92,6 +94,8 @@ else if (_formModel != null)
 
     protected override async Task OnInitializedAsync()
     {
+        ExceptionHandler.OnUnhandledException += HandleException;
+
         var client = await ClientService.Get(ClientId);
         _isRevoked = client.IsRevoked ?? false;
 
@@ -104,7 +108,7 @@ else if (_formModel != null)
                 Message = "User has been revoked.",
                 Severity = "danger"
             };
-            _isNotificationVisible = true;
+            _notification.IsVisible = true;
         }
 
         var viewModel = new UpdateClientViewModel
@@ -131,9 +135,28 @@ else if (_formModel != null)
             .Build();
     }
 
+    public void Dispose()
+    {
+        ExceptionHandler.OnUnhandledException -= HandleException;
+    }
+
     private async Task HandleClose()
     {
         await OnClose.InvokeAsync(false);
+    }
+
+    private void HandleException(object sender, Exception e)
+    {
+        _isLoading = false;
+        _notification = new NotificationDto
+        {
+            Icon = "exclamation-triangle",
+            IconCss = "has-text-warning",
+            Message = e is TunnelException te ? te.FormattedMessage : e.Message,
+            Severity = "danger"
+        };
+        _notification.IsVisible = true;
+        StateHasChanged();
     }
 
     private async Task Reinstate()
@@ -175,7 +198,7 @@ else if (_formModel != null)
                 Message = "Please fill the required fields in the form below.",
                 Severity = "danger"
             };
-            _isNotificationVisible = true;
+            _notification.IsVisible = true;
             return;
         }
 

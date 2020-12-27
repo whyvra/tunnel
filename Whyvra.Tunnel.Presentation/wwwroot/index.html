@@ -7,8 +7,8 @@
     <title>Tunnel</title>
     <base href="/" />
 
-    <link rel="stylesheet" type="text/css" href="css/bulmaswatch.min.css" integrity="sha384-lP/YRCrL9YAAe68K7HzXH5qC1+B2J48VZ6BMhBRvb2OdOn8NuVjH1ebSuugP7pUE" crossorigin="anonymous">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.4.1/styles/monokai-sublime.min.css" integrity="sha512-/l4iViNMhxR5MhSlak3Yw/L/7qUBifVy7MpLjeJTc8BPMRFbGplGN0xqufCDwhSdxSnVgy+e/OYsNnU75K3yyQ==" crossorigin="anonymous">
+    <link rel="stylesheet" type="text/css" href="https://unpkg.com/bulmaswatch/darkly/bulmaswatch.min.css" integrity="sha384-lP/YRCrL9YAAe68K7HzXH5qC1+B2J48VZ6BMhBRvb2OdOn8NuVjH1ebSuugP7pUE" crossorigin="anonymous">
+    <link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.4.1/styles/monokai-sublime.min.css" integrity="sha512-/l4iViNMhxR5MhSlak3Yw/L/7qUBifVy7MpLjeJTc8BPMRFbGplGN0xqufCDwhSdxSnVgy+e/OYsNnU75K3yyQ==" crossorigin="anonymous">
     <link rel="stylesheet" type="text/css" href="css/app.css">
 </head>
 
@@ -24,26 +24,7 @@
     <script src="_framework/blazor.webassembly.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.4.1/highlight.min.js" integrity="sha512-DrpaExP2d7RJqNhXB41Q/zzzQrtb6J0zfnXD5XeVEWE8d9Hj54irCLj6dRS3eNepPja7DvKcV+9PnHC7A/g83A==" crossorigin="anonymous"></script>
     <script src="js/ini.min.js"></script>
-    <script>
-        document.addEventListener('highlight', () => {
-            document.querySelectorAll('pre code').forEach((block) => {
-                hljs.highlightBlock(block);
-            });
-        });
-
-        window.HighlightService = {
-            trigger: () => {
-                document.dispatchEvent(new CustomEvent('highlight'))
-            }
-        };
-
-        window.clipboardCopy = {
-            copyText: (text) => {
-                navigator.clipboard.writeText(text)
-                    .catch((error) => console.log);
-        }
-};
-    </script>
+    <script src="js/services.js"></script>
 </body>
 
 </html>

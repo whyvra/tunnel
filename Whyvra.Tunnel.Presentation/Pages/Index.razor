@@ -94,11 +94,14 @@
 
     protected override async Task OnInitializedAsync()
     {
-        var provider = Services.GetService<AuthenticationStateProvider>();
-        var state = await provider.GetAuthenticationStateAsync();
-        var user = state.User;
+        if (Auth.Value.Enabled)
+        {
+            var provider = Services.GetService<AuthenticationStateProvider>();
+            var state = await provider.GetAuthenticationStateAsync();
+            var user = state.User;
 
-        var role = user.Claims.SingleOrDefault(x => x.Type.Equals("roles") && x.Value.Equals(Auth.Value.RequiredRole));
-        _userNotInRole = user.Identity.IsAuthenticated && role == null;
+            var role = user.Claims.SingleOrDefault(x => x.Type.Equals("roles") && x.Value.Equals(Auth.Value.RequiredRole));
+            _userNotInRole = user.Identity.IsAuthenticated && role == null;
+        }
     }
 }

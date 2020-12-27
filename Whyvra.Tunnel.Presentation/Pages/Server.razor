@@ -196,7 +196,7 @@ else if (_notFound)
 
     private async Task CopyToClipboard()
     {
-        await js.InvokeVoidAsync("clipboardCopy.copyText", _serverConfig);
+        await js.InvokeVoidAsync("ClipboardService.copyText", _serverConfig);
         _notification = new NotificationDto
         {
             Icon = "paste",

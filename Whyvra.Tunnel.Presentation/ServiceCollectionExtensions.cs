@@ -10,6 +10,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using QRCoder;
+using Whyvra.Tunnel.Common.Configuration;
 using Whyvra.Tunnel.Common.Models;
 using Whyvra.Tunnel.Common.Models.Validation;
 using Whyvra.Tunnel.Presentation.Authentication;
@@ -31,7 +32,7 @@ namespace Whyvra.Tunnel.Presentation
 
             // Add options for authentication
             builder.Services
-                .AddOptions<AuthenticationOptions>()
+                .AddOptions<AuthOptions>()
                 .Configure(x => builder.Configuration.Bind("auth", x));
 
             // Get values from config
@@ -39,7 +40,13 @@ namespace Whyvra.Tunnel.Presentation
             var auth = builder.Configuration.GetValue<bool>("auth:enabled");
 
             // Register HTTP client
-            var apiClient = builder.Services.AddHttpClient("TunnelApi", x => x.BaseAddress = new Uri(apiUrl));
+            var apiClient = builder.Services.AddHttpClient("TunnelApi", x => {
+                var url = apiUrl.StartsWith("/")
+                    ? builder.HostEnvironment.BaseAddress + apiUrl
+                    : apiUrl;
+
+                x.BaseAddress = new Uri(url);
+            });
             if (auth)
             {
                 // Register custom provider and handle to use id_token instead of access_token for OIDC

@@ -3,6 +3,7 @@ using System.Linq;
 using System.Security.Claims;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Options;
+using Whyvra.Tunnel.Common.Configuration;
 using Whyvra.Tunnel.Core.Users;
 
 namespace Whyvra.Tunnel.Api.Authentication
@@ -10,9 +11,9 @@ namespace Whyvra.Tunnel.Api.Authentication
     public class HttpUserManager : IUserManager
     {
         private readonly IHttpContextAccessor _accessor;
-        private readonly AuthenticationOptions _opts;
+        private readonly AuthOptions _opts;
 
-        public HttpUserManager(IHttpContextAccessor accessor, IOptions<AuthenticationOptions> opts)
+        public HttpUserManager(IHttpContextAccessor accessor, IOptions<AuthOptions> opts)
         {
             _accessor = accessor;
             _opts = opts.Value;

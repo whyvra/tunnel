@@ -5,16 +5,16 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Components.WebAssembly.Authentication;
 using Microsoft.Extensions.Options;
 using Microsoft.JSInterop;
-using Whyvra.Tunnel.Presentation.Configuration;
+using Whyvra.Tunnel.Common.Configuration;
 
 namespace Whyvra.Tunnel.Presentation.Authentication
 {
     public class IdTokenProvider : IAccessTokenProvider
     {
-        private readonly AuthenticationOptions _auth;
+        private readonly AuthOptions _auth;
         private readonly IJSRuntime _runtime;
 
-        public IdTokenProvider(IOptions<AuthenticationOptions> auth, IJSRuntime runtime)
+        public IdTokenProvider(IOptions<AuthOptions> auth, IJSRuntime runtime)
         {
             _auth = auth.Value;
             _runtime = runtime;

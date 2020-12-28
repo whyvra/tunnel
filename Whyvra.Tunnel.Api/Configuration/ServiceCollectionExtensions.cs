@@ -6,13 +6,13 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.OpenApi.Models;
-using Whyvra.Tunnel.Api.Authentication;
+using Whyvra.Tunnel.Common.Configuration;
 
 namespace Whyvra.Tunnel.Api.Configuration
 {
     public static class ServiceCollectionExtensions
     {
-        public static IServiceCollection AddJwt(this IServiceCollection services, AuthenticationOptions opts)
+        public static IServiceCollection AddJwt(this IServiceCollection services, AuthOptions opts)
         {
             if (opts.Enabled)
             {
@@ -25,9 +25,9 @@ namespace Whyvra.Tunnel.Api.Configuration
                     })
                     .AddJwtBearer(x =>
                     {
-                        x.Audience = opts.Audience;
-                        x.Authority = opts.Issuer;
-                        x.MetadataAddress = opts.WellKnownEndpoint;
+                        x.Audience = opts.ClientId;
+                        x.Authority = opts.Authority;
+                        x.MetadataAddress = $"{opts.Authority}/.well-known/openid-configuration";
                         x.RequireHttpsMetadata = true;
 
                         x.TokenValidationParameters.ClockSkew = TimeSpan.Zero;
@@ -55,7 +55,7 @@ namespace Whyvra.Tunnel.Api.Configuration
             return services;
         }
 
-        public static IServiceCollection AddSwagger(this IServiceCollection services, AuthenticationOptions opts)
+        public static IServiceCollection AddSwagger(this IServiceCollection services, AuthOptions opts)
         {
             return services
                 .AddSwaggerGen(x =>

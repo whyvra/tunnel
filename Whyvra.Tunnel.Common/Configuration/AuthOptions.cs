@@ -1,6 +1,6 @@
-namespace Whyvra.Tunnel.Presentation.Configuration
+namespace Whyvra.Tunnel.Common.Configuration
 {
-    public class AuthenticationOptions
+    public class AuthOptions
     {
         public string Authority { get; set; }
 
@@ -9,5 +9,7 @@ namespace Whyvra.Tunnel.Presentation.Configuration
         public bool Enabled { get; set; }
 
         public string RequiredRole { get; set; }
+
+        public string ResponseType { get; set; } = "code";
     }
 }

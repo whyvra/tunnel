@@ -12,6 +12,7 @@ using Microsoft.Extensions.Hosting;
 using Whyvra.Tunnel.Api.Authentication;
 using Whyvra.Tunnel.Api.Configuration;
 using Whyvra.Tunnel.Api.Filters;
+using Whyvra.Tunnel.Common.Configuration;
 using Whyvra.Tunnel.Common.Models.Validation;
 using Whyvra.Tunnel.Core;
 using Whyvra.Tunnel.Core.Users;
@@ -33,12 +34,12 @@ namespace Whyvra.Tunnel.Api
         public void ConfigureServices(IServiceCollection services)
         {
             // Load auth options for configuration
-            var authOptions = new AuthenticationOptions();
+            var authOptions = new AuthOptions();
             Configuration.Bind("auth", authOptions);
 
             // Register auth options
             services
-                .AddOptions<AuthenticationOptions>()
+                .AddOptions<AuthOptions>()
                 .Configure(x => Configuration.Bind("auth", x));
 
             // Register JWT authentication if enabled

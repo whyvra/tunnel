@@ -1,6 +1,7 @@
 using System.Reflection;
 using MediatR;
 using Microsoft.Extensions.DependencyInjection;
+using Whyvra.Tunnel.Core.Clients;
 using Whyvra.Tunnel.Data;
 
 namespace Whyvra.Tunnel.Core
@@ -11,6 +12,7 @@ namespace Whyvra.Tunnel.Core
         {
             return services
                 .AddScoped<IEventTracker, EventTracker>()
+                .AddScoped<ClientValidator>()
                 .AddMediatR(Assembly.GetExecutingAssembly());
         }
     }

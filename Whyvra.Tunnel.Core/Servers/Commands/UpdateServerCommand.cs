@@ -7,6 +7,6 @@ namespace Whyvra.Tunnel.Core.Servers.Commands
     {
         public int Id { get; set; }
 
-        public CreateUpdateServerDto Data { get; set; }
+        public CreateUpdateServerDto Server { get; set; }
     }
 }

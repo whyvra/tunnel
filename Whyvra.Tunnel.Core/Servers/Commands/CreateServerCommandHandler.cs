@@ -1,7 +1,9 @@
+using System;
 using System.Net;
 using System.Threading;
 using System.Threading.Tasks;
 using MediatR;
+using Microsoft.EntityFrameworkCore;
 using Whyvra.Tunnel.Data;
 using Whyvra.Tunnel.Data.Configuration;
 using Whyvra.Tunnel.Domain.Entitites;
@@ -19,15 +21,18 @@ namespace Whyvra.Tunnel.Core.Servers.Commands
 
         public async Task<int> Handle(CreateServerCommand command, CancellationToken cancellationToken)
         {
+            var exists = await _context.Servers.AnyAsync(x => x.Name == command.Server.Name, cancellationToken);
+            if (exists) throw new ArgumentException($"A server with name '{command.Server.Name}' already exists.");
+
             var server = new WireguardServer
             {
-                Name = command.Data.Name,
-                Description = command.Data.Description,
-                AssignedRange = command.Data.AssignedRange.ToAddress(),
-                Dns = IPAddress.Parse(command.Data.Dns),
-                Endpoint = command.Data.Endpoint,
-                ListenPort = command.Data.ListenPort,
-                PublicKey = command.Data.PublicKey
+                Name = command.Server.Name,
+                Description = command.Server.Description,
+                AssignedRange = command.Server.AssignedRange.ToAddress(),
+                Dns = IPAddress.Parse(command.Server.Dns),
+                Endpoint = command.Server.Endpoint,
+                ListenPort = command.Server.ListenPort,
+                PublicKey = command.Server.PublicKey
             };
 
             await _context.Servers.AddAsync(server, cancellationToken);

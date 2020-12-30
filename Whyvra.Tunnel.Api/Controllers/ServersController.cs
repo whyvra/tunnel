@@ -47,7 +47,7 @@ namespace Whyvra.Tunnel.Api.Controllers
         [ProducesResponseType(201)]
         public async Task<IActionResult> Post([FromBody] CreateUpdateServerDto server, CancellationToken cancellationToken)
         {
-            var command = new CreateServerCommand {Data = server};
+            var command = new CreateServerCommand {Server = server};
             var id = await Mediator.Send(command, cancellationToken);
 
             return new JsonResult(new {id})
@@ -64,7 +64,7 @@ namespace Whyvra.Tunnel.Api.Controllers
         [ProducesResponseType(204)]
         public async Task<IActionResult> Put(int id, [FromBody] CreateUpdateServerDto server, CancellationToken cancellationToken)
         {
-            var command = new UpdateServerCommand {Id = id, Data = server};
+            var command = new UpdateServerCommand {Id = id, Server = server};
             await Mediator.Send(command, cancellationToken);
 
             return NoContent();

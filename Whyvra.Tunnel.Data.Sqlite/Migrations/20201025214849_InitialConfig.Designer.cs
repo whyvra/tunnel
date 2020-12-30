@@ -234,7 +234,6 @@ namespace Whyvra.Tunnel.Data.Sqlite.Migrations
                         .HasMaxLength(128);
 
                     b.Property<bool>("IsRevoked")
-                        .IsRequired()
                         .HasColumnType("INTEGER");
 
                     b.Property<string>("Name")
@@ -255,13 +254,13 @@ namespace Whyvra.Tunnel.Data.Sqlite.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("AssignedIp")
-                        .IsUnique();
-
-                    b.HasIndex("Name")
-                        .IsUnique();
-
                     b.HasIndex("ServerId");
+
+                    b.HasIndex("AssignedIp", "ServerId")
+                        .IsUnique();
+
+                    b.HasIndex("Name", "ServerId")
+                        .IsUnique();
 
                     b.ToTable("Clients");
                 });
@@ -292,7 +291,6 @@ namespace Whyvra.Tunnel.Data.Sqlite.Migrations
                         .HasColumnType("TEXT");
 
                     b.Property<int>("ListenPort")
-                        .IsRequired()
                         .HasColumnType("INTEGER");
 
                     b.Property<string>("Name")

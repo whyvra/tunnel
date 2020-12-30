@@ -1,4 +1,5 @@
 using System;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using MediatR;
@@ -10,10 +11,12 @@ namespace Whyvra.Tunnel.Core.Clients.Commands
 {
     public class UpdateClientCommandHandler : IRequestHandler<UpdateClientCommand>
     {
+        private readonly ClientValidator _clientValidator;
         private readonly ITunnelContext _context;
 
-        public UpdateClientCommandHandler(ITunnelContext context)
+        public UpdateClientCommandHandler(ClientValidator clientValidator, ITunnelContext context)
         {
+            _clientValidator = clientValidator;
             _context = context;
         }
 
@@ -24,6 +27,16 @@ namespace Whyvra.Tunnel.Core.Clients.Commands
 
             if (client == null) throw new NullReferenceException($"Client with id #{command.Id} could not be found.");
 
+            // Ensure client is unique
+            await _clientValidator.EnsureUniqueClientOnUpdate(
+                client.Id,
+                command.Client.Name,
+                command.Client.AssignedIp,
+                client.ServerId,
+                cancellationToken
+            );
+
+            // Update properties
             client.Name = command.Client.Name;
             client.Description = command.Client.Description;
             client.AssignedIp = command.Client.AssignedIp.ToAddress();

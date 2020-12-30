@@ -12,17 +12,11 @@ namespace Whyvra.Tunnel.Data.Configuration
                 .HasMaxLength(64)
                 .IsRequired();
 
-            builder.HasIndex(x => x.Name)
-                .IsUnique();
-
             builder.Property(x => x.Description)
                 .HasMaxLength(128);
 
             builder.Property(x => x.AssignedIp)
                 .IsRequired();
-
-            builder.HasIndex(x => x.AssignedIp)
-                .IsUnique();
 
             builder.Property(x => x.IsRevoked)
                 .IsRequired();
@@ -40,6 +34,13 @@ namespace Whyvra.Tunnel.Data.Configuration
 
             builder.Property(x => x.UpdatedAt)
                 .IsRequired();
+
+            // Setup unique indexes on a per server basis
+            builder.HasIndex(x => new {x.Name, x.ServerId})
+                .IsUnique();
+
+            builder.HasIndex(x => new {x.AssignedIp, x.ServerId})
+                .IsUnique();
 
             builder.HasMany(x => x.AllowedIps)
                 .WithOne(x => x.Client);

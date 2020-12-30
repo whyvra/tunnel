@@ -241,7 +241,6 @@ namespace Whyvra.Tunnel.Data.Postgres.Migrations
                         .HasMaxLength(128);
 
                     b.Property<bool>("IsRevoked")
-                        .IsRequired()
                         .HasColumnType("boolean");
 
                     b.Property<string>("Name")
@@ -262,13 +261,13 @@ namespace Whyvra.Tunnel.Data.Postgres.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("AssignedIp")
-                        .IsUnique();
-
-                    b.HasIndex("Name")
-                        .IsUnique();
-
                     b.HasIndex("ServerId");
+
+                    b.HasIndex("AssignedIp", "ServerId")
+                        .IsUnique();
+
+                    b.HasIndex("Name", "ServerId")
+                        .IsUnique();
 
                     b.ToTable("Clients");
                 });
@@ -297,6 +296,9 @@ namespace Whyvra.Tunnel.Data.Postgres.Migrations
                     b.Property<string>("Endpoint")
                         .IsRequired()
                         .HasColumnType("text");
+
+                    b.Property<int>("ListenPort")
+                        .HasColumnType("integer");
 
                     b.Property<string>("Name")
                         .IsRequired()

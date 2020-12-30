@@ -191,21 +191,21 @@ namespace Whyvra.Tunnel.Data.Postgres.Migrations
                 unique: true);
 
             migrationBuilder.CreateIndex(
-                name: "IX_Clients_AssignedIp",
-                table: "Clients",
-                column: "AssignedIp",
-                unique: true);
-
-            migrationBuilder.CreateIndex(
-                name: "IX_Clients_Name",
-                table: "Clients",
-                column: "Name",
-                unique: true);
-
-            migrationBuilder.CreateIndex(
                 name: "IX_Clients_ServerId",
                 table: "Clients",
                 column: "ServerId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Clients_AssignedIp_ServerId",
+                table: "Clients",
+                columns: new[] { "AssignedIp", "ServerId" },
+                unique: true);
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Clients_Name_ServerId",
+                table: "Clients",
+                columns: new[] { "Name", "ServerId" },
+                unique: true);
 
             migrationBuilder.CreateIndex(
                 name: "IX_Events_UserId",

@@ -5,6 +5,6 @@ namespace Whyvra.Tunnel.Core.Servers.Commands
 {
     public class CreateServerCommand : IRequest<int>
     {
-        public CreateUpdateServerDto Data { get; set; }
+        public CreateUpdateServerDto Server { get; set; }
     }
 }

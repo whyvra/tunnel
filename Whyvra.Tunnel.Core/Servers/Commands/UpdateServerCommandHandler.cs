@@ -27,14 +27,18 @@ namespace Whyvra.Tunnel.Core.Servers.Commands
             // Throw an error if not found
             if (server == null) throw new NullReferenceException($"Cannot find server with id #{command.Id}");
 
+            // Ensure name is unique
+            var exists = await _context.Servers.AnyAsync(x => x.Name == command.Server.Name && x.Id != command.Id, cancellationToken);
+            if (exists) throw new ArgumentException($"A server with name '{command.Server.Name}' already exists.");
+
             // Update server properties
-            server.Name = command.Data.Name;
-            server.Description = command.Data.Description;
-            server.AssignedRange = command.Data.AssignedRange.ToAddress();
-            server.Dns = IPAddress.Parse(command.Data.Dns);
-            server.Endpoint = command.Data.Endpoint;
-            server.ListenPort = command.Data.ListenPort;
-            server.PublicKey = command.Data.PublicKey;
+            server.Name = command.Server.Name;
+            server.Description = command.Server.Description;
+            server.AssignedRange = command.Server.AssignedRange.ToAddress();
+            server.Dns = IPAddress.Parse(command.Server.Dns);
+            server.Endpoint = command.Server.Endpoint;
+            server.ListenPort = command.Server.ListenPort;
+            server.PublicKey = command.Server.PublicKey;
 
             // Save changes
             await _context.SaveChangesAsync(cancellationToken);

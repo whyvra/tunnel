@@ -80,7 +80,17 @@ else if (_formModel != null)
 {
     private string _copy;
     private BulmaForm<UpdateClientViewModel> _form;
-    private FormViewMode _formMode = FormViewMode.Readonly;
+    private FormViewMode _currentFormMode = FormViewMode.Readonly;
+    private FormViewMode _previousFormMode = FormViewMode.Readonly;
+    private FormViewMode _formMode
+    {
+        get { return _currentFormMode; }
+        set
+        {
+            _previousFormMode = _currentFormMode;
+            _currentFormMode = value;
+        }
+    }
     private FormModel<UpdateClientViewModel> _formModel;
     private bool _isLoading;
     private bool _isRevoked;
@@ -147,6 +157,7 @@ else if (_formModel != null)
 
     private void HandleException(object sender, Exception e)
     {
+        _formMode = _previousFormMode;
         _isLoading = false;
         _notification = new NotificationDto
         {
@@ -207,8 +218,8 @@ else if (_formModel != null)
         var updated = false;
 
         // Dirty check
-        var copy = JsonSerializer.Deserialize<UpdateClientViewModel>(_copy);
-        var isDirty = IsDirty(model.Client, copy.Client);
+        var copy = JsonSerializer.Deserialize<ClientDto>(_copy);
+        var isDirty = IsDirty(model.Client, copy);
 
         if (isDirty)
         {
@@ -226,10 +237,10 @@ else if (_formModel != null)
         await OnClose.InvokeAsync(updated);
     }
 
-    private bool IsDirty(UpdateClientDto model, UpdateClientDto copy)
+    private bool IsDirty(UpdateClientDto model,ClientDto copy)
     {
         return !(model.Name.Equals(copy.Name)
-            && model.Description.Equals(copy.Description)
+            && ((string.IsNullOrWhiteSpace(model.Description) && string.IsNullOrWhiteSpace(copy.Description)) || model.Description.Equals(copy.Description))
             && model.AssignedIp.Equals(copy.AssignedIp)
             && model.PublicKey.Equals(copy.PublicKey));
     }

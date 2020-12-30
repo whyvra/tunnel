@@ -20,6 +20,30 @@
 }
 else if (_formModel != null)
 {
+    @if(_showDeleteConfirm)
+    {
+        <Modal Icon="trash-alt" IconCss="has-text-danger" ModalCss="z-index: 45;" OnClose="@(() => _showDeleteConfirm = false)" Title="Confirm deletion">
+            <ChildContent>
+                <p>
+                    Are you sure you want to delete client @_formModel.DataModel.Client.Name ?
+                </p>
+            </ChildContent>
+            <Buttons>
+                <button class="button is-success" @onclick="Delete">
+                    <span class="icon">
+                        <i class="fas fa-check"></i>
+                    </span>
+                    <span>Yes</span>
+                </button>
+                <button class="button is-danger" @onclick="@(() => _showDeleteConfirm = false)">
+                    <span class="icon">
+                        <i class="fas fa-times"></i>
+                    </span>
+                    <span>No</span>
+                </button>
+            </Buttons>
+        </Modal>
+    }
     <Modal Icon="@(_isRevoked ? "user-slash" : "user")" Title="Client" IconCss="has-text-info"
         OnClose="HandleClose">
         <ChildContent>
@@ -50,7 +74,7 @@ else if (_formModel != null)
             }
             @if (!_isRevoked)
             {
-                <button class="button is-danger" disabled="@(_formMode == FormViewMode.Edit)" @onclick="Revoke">
+                <button class="button is-primary" disabled="@(_formMode == FormViewMode.Edit)" @onclick="Revoke">
                     <span class="icon">
                         <i class="fas fa-ban"></i>
                     </span>
@@ -66,6 +90,12 @@ else if (_formModel != null)
                     <span>Reinstate</span>
                 </button>
             }
+            <button class="button is-danger" disabled="@(_formMode == FormViewMode.Edit)" @onclick="@(() => _showDeleteConfirm = true)">
+                <span class="icon">
+                    <i class="fas fa-trash-alt"></i>
+                </span>
+                <span>Delete</span>
+            </button>
             <button class="button" @onclick="HandleClose">
                 <span class="icon">
                     <i class="fas fa-times"></i>
@@ -95,6 +125,7 @@ else if (_formModel != null)
     private bool _isLoading;
     private bool _isRevoked;
     private NotificationDto _notification = new NotificationDto();
+    private bool _showDeleteConfirm;
 
     [Parameter]
     public int ClientId { get; set; }
@@ -143,6 +174,15 @@ else if (_formModel != null)
             .Input(x => x.Client.PublicKey).WithIcon("key")
             .WithModel(viewModel)
             .Build();
+    }
+
+    public async Task Delete()
+    {
+        _isLoading = true;
+        _showDeleteConfirm = false;
+
+        await ClientService.Delete(ClientId);
+        await OnClose.InvokeAsync(true);
     }
 
     public void Dispose()

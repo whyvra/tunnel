@@ -39,6 +39,20 @@ namespace Whyvra.Tunnel.Api.Controllers
         }
 
         /// <summary>
+        /// Delete a WireGuard client
+        /// </summary>
+        /// <response code="204">NoContent</response>
+        [HttpDelete("{id}")]
+        [ProducesResponseType(204)]
+        public async Task<IActionResult> Delete(int id, CancellationToken cancellationToken)
+        {
+            var command = new DeleteClientCommand {Id = id};
+            await Mediator.Send(command, cancellationToken);
+
+            return NoContent();
+        }
+
+        /// <summary>
         /// Add a network address to a WireGuard client's allowed IPs
         /// </summary>
         /// <response code="201">Created</response>

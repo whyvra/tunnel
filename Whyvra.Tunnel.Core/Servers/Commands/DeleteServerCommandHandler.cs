@@ -19,7 +19,7 @@ namespace Whyvra.Tunnel.Core.Servers.Commands
         public async Task<Unit> Handle(DeleteServerCommand command, CancellationToken cancellationToken)
         {
             var server = await _context.Servers
-                .SingleOrDefaultAsync(x => x.Id == command.Id);
+                .SingleOrDefaultAsync(x => x.Id == command.Id, cancellationToken);
 
             if (server == null ) throw new NullReferenceException($"Server with id #{command.Id} could not be found.");
 

@@ -23,7 +23,7 @@ namespace Whyvra.Tunnel.Core.Clients.Commands
 
             if (clientAddress == null)
             {
-                throw new NullReferenceException($"Cannot find network address #{command.NetworkAddressId} on client #{command.ClientId}.");
+                throw new NullReferenceException($"A network address #{command.NetworkAddressId} on client #{command.ClientId} could not be found.");
             }
 
             _context.ClientNetworkAddresses.Remove(clientAddress);

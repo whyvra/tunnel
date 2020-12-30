@@ -19,7 +19,7 @@
     </div>
     
     <div class="actions-panel">
-        <AuthWrapper>
+        <AuthView>
             <ChildContent>
                 <ServerDropdown></ServerDropdown>
                 <NavLink class="button is-primary" href="/servers">
@@ -52,7 +52,7 @@
                     </NavLink>
                 }
             </NotAuthorizedContent>
-        </AuthWrapper>
+        </AuthView>
     </div>
 </div>
 @if (tiles != null && tiles.Length > 0)

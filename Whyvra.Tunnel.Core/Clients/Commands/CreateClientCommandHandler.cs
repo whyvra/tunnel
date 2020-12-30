@@ -25,7 +25,7 @@ namespace Whyvra.Tunnel.Core.Clients.Commands
         public async Task<int> Handle(CreateClientCommand command, CancellationToken cancellationToken)
         {
             var server = await _context.Servers.AsNoTracking().SingleOrDefaultAsync(x => x.Id == command.ServerId, cancellationToken);
-            if (server == null) throw new NullReferenceException($"Cannot find server with id #{command.ServerId}");
+            if (server == null) throw new NullReferenceException($"A server with id #{command.ServerId} could not be found.");
 
             // Ensure client is unique
             await _clientValidator.EnsureUniqueClientOnCreate(

@@ -33,6 +33,12 @@ namespace Whyvra.Tunnel.Presentation.Services
             return response.Id;
         }
 
+        public async Task Delete(int id)
+        {
+            var result = await _http.DeleteAsync($"{_api.Url}/clients/{id}");
+            await result.EnsureSuccess();
+        }
+
         public async Task<ClientDto> Get(int id)
         {
             return await _http.GetFromJsonAsyncWithSuccess<ClientDto>($"{_api.Url}/clients/{id}");

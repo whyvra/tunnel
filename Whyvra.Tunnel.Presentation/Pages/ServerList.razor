@@ -43,7 +43,7 @@ else if (_servers != null)
 
     @if (_showServerPopup)
     {
-        <ServerForm ServerId="@_serverId" CloseAction="ClosePopup" />
+        <ServerForm ServerId="@_serverId" OnClose="ClosePopup" />
     }
 
 @code

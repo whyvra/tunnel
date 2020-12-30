@@ -47,9 +47,9 @@ namespace Whyvra.Tunnel.Core.Servers.Queries
                     CreatedAt = x.CreatedAt,
                     UpdatedAt = x.UpdatedAt
                 })
-                .SingleOrDefaultAsync(x => x.Id == query.Id);
+                .SingleOrDefaultAsync(x => x.Id == query.Id, cancellationToken);
 
-            if (server == null) throw new NullReferenceException($"Cannot find server with id #{query.Id}");
+            if (server == null) throw new NullReferenceException($"A server with id #{query.Id} could not be found.");
 
             return server;
         }

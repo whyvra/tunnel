@@ -1,0 +1,269 @@
+@using System.Text.Json
+@using FluentValidation
+@using Whyvra.Blazor.Forms.Renderer
+
+@implements IDisposable
+
+@inject IExceptionHandler ExceptionHandler
+@inject IValidator<ServerViewModel> Validator
+@inject NetworkAddressService NetworkAddressService
+@inject ServerService ServerService
+
+@if (_isLoading)
+{
+    <div class="modal is-active">
+        <div class="modal-background"></div>
+        <div class="modal-content modal-loader">
+            <button class="button is-loading is-large"></button>
+        </div>
+    </div>
+} 
+else if (_formModel != null)
+{
+    @if(_showDeleteConfirm)
+    {
+        <Modal Icon="trash-alt" IconCss="has-text-danger" ModalCss="z-index: 45;" OnClose="@(() => _showDeleteConfirm = false)" Title="Confirm deletion">
+            <ChildContent>
+                <p>
+                    Are you sure you want to delete server @_formModel.DataModel.Server.Name ?
+                    All it's data along with its clients configuration will be lost!
+                </p>
+            </ChildContent>
+            <Buttons>
+                <button class="button is-success" @onclick="Delete">
+                    <span class="icon">
+                        <i class="fas fa-check"></i>
+                    </span>
+                    <span>Yes</span>
+                </button>
+                <button class="button is-danger" @onclick="@(() => _showDeleteConfirm = false)">
+                    <span class="icon">
+                        <i class="fas fa-times"></i>
+                    </span>
+                    <span>No</span>
+                </button>
+            </Buttons>
+        </Modal>
+    }
+    <Modal Icon="info-circle" IconCss="has-text-info" OnClose="InvokeClose" Title="Server info">
+        <ChildContent>
+            @if (_notification.IsVisible)
+            {
+                <Notification NotificationDto="@_notification" OnClose="@(() => _notification.IsVisible = false)"></Notification>
+            }
+            <BulmaForm @ref="_form" FormModel="@_formModel" FormViewMode="@_formViewMode"></BulmaForm>
+        </ChildContent>
+        <Buttons>
+            @if (_formViewMode == FormViewMode.Readonly)
+            {
+                <button class="button is-warning" @onclick="@(() => _formViewMode = FormViewMode.Edit)">
+                    <span class="icon">
+                        <i class="fas fa-pencil-alt"></i>
+                    </span>
+                    <span>Edit</span>
+                </button>
+            }
+            @if (_formViewMode != FormViewMode.Readonly)
+            {
+                <button class="button is-primary" @onclick="SaveChanges">
+                    <span class="icon">
+                        <i class="fas fa-save"></i>
+                    </span>
+                    <span>Save changes</span>
+                </button>
+            }
+            @if (_formViewMode != FormViewMode.Blank)
+            {
+                <button class="button is-danger" @onclick="@(() => _showDeleteConfirm = true)">
+                    <span class="icon">
+                        <i class="fas fa-trash-alt"></i>
+                    </span>
+                    <span>Delete</span>
+                </button>
+            }
+            <button class="button" @onclick="InvokeClose">
+                <span class="icon">
+                    <i class="fas fa-times"></i>
+                </span>
+                <span>Cancel</span>
+            </button>
+        </Buttons>
+    </Modal>
+}
+
+@code
+{
+    private string _copy;
+    private ServerDto _server;
+    private BulmaForm<ServerViewModel> _form;
+    private FormModel<ServerViewModel> _formModel;
+    private FormViewMode _formViewMode = FormViewMode.Readonly;
+    private bool _isLoading;
+    private NotificationDto _notification { get; set; } = new NotificationDto();
+    private bool _showDeleteConfirm;
+
+    [Parameter]
+    public int? ServerId { get; set; }
+
+    [Parameter]
+    public EventCallback<bool> OnClose { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        ExceptionHandler.OnUnhandledException += HandleException;
+        var fb = new FormBuilder<ServerViewModel>();
+
+        fb
+            .Input(x => x.Server.Name).WithIcon("server")
+            .TextArea(x => x.Server.Description, rows: 3)
+            .Input(x => x.Server.AssignedRange).WithText("Assigned IP Range").WithIcon("network-wired")
+            .TagsInput(x => x.DefaultAllowedRange).WithDefaultEmptyValue("No IP range has been assigned")
+            .Input(x => x.Server.Dns).WithText("DNS").WithIcon("address-book")
+            .Input(x => x.Server.Endpoint).WithIcon("globe")
+            .Number(x => x.Server.ListenPort).WithText("Port to listen").WithIcon("ethernet")
+            .Input(x => x.Server.PublicKey).WithIcon("key");
+
+        if (ServerId.HasValue)
+        {
+            // Query backend 
+            _server = await ServerService.Get(ServerId.Value);
+            // Store a copy for dirty checks
+            _copy = JsonSerializer.Serialize(_server);
+
+            // Instantiate our view model
+            var viewModel = new ServerViewModel
+            {
+                Server = new CreateUpdateServerDto
+                {
+                    Name = _server.Name,
+                    Description = _server.Description,
+                    AssignedRange = _server.AssignedRange,
+                    Dns = _server.Dns,
+                    Endpoint = _server.Endpoint,
+                    ListenPort = _server.ListenPort,
+                    PublicKey = _server.PublicKey
+                },
+                DefaultAllowedRange = _server.DefaultAllowedRange
+            };
+
+            fb.WithModel(viewModel);
+        }
+        else
+        {
+            _formViewMode = FormViewMode.Blank;
+        }
+
+        _formModel = fb.Build();
+    }
+
+    public async Task Delete()
+    {
+        _isLoading = true;
+        _showDeleteConfirm = false;
+
+        if (ServerId.HasValue)
+        {
+            await ServerService.Delete(ServerId.Value);
+        }
+
+        await OnClose.InvokeAsync(true);
+    }
+
+    public void Dispose()
+    {
+        ExceptionHandler.OnUnhandledException -= HandleException;
+    }
+
+    private void HandleException(object sender, Exception e)
+    {
+        _isLoading = false;
+        _notification = new NotificationDto
+        {
+            Icon = "exclamation-triangle",
+            IconCss = "has-text-warning",
+            Message = e is TunnelException te ? te.FormattedMessage : e.Message,
+            Severity = "danger"
+        };
+        _notification.IsVisible = true;
+        StateHasChanged();
+    }
+
+    private async Task InvokeClose()
+    {
+        await OnClose.InvokeAsync(false);
+    }
+
+    protected async Task SaveChanges()
+    {
+        // Check if model is valid
+        var model = _formModel.DataModel;
+        var result = Validator.Validate(model);
+
+        if (!result.IsValid)
+        {
+            _form.Validate();
+            _notification = new NotificationDto
+            {
+                Icon = "exclamation-triangle",
+                IconCss = "has-text-warning",
+                Message = "Please fill the required fields in the form below.",
+                Severity = "danger"
+            };
+            _notification.IsVisible = true;
+            return;
+        }
+
+        if (result.IsValid)
+        {
+            // Start loading screen
+            _isLoading = true;
+            _server = null;
+            var wasUpdated = false;
+
+            if (_formViewMode == FormViewMode.Edit && ServerId.HasValue)
+            {
+                wasUpdated = await Update(model, ServerId.Value);
+            }
+            else if (_formViewMode == FormViewMode.Blank)
+            {
+                var id = await ServerService.CreateNew(model.Server);
+                wasUpdated = true;
+                await NetworkAddressService.ProcessNetworkAddresses(ServerService, id, model.DefaultAllowedRange, Enumerable.Empty<string>());
+            }
+
+            // Trigger modal close
+            await OnClose.InvokeAsync(wasUpdated);
+        }
+    }
+
+    private async Task<bool> Update(ServerViewModel viewModel, int serverId)
+    {
+        // Load stored copy for dirty check
+        var original = JsonSerializer.Deserialize<ServerDto>(_copy);
+        var wasUpdated = false;
+
+        if(IsDirty(viewModel.Server, original))
+        {
+            // Update record if properties have changed
+            await ServerService.Update(serverId, viewModel.Server);
+            wasUpdated = true;
+        }
+
+        // Process network address in DefaultAllowedRange
+        await NetworkAddressService.ProcessNetworkAddresses(ServerService, serverId, viewModel.DefaultAllowedRange, original.DefaultAllowedRange);
+
+        return wasUpdated;
+    }
+
+
+    private bool IsDirty(CreateUpdateServerDto server, ServerDto original)
+    {
+        return !(server.Name.Equals(original.Name)
+            && server.Description.Equals(original.Description)
+            && server.AssignedRange.Equals(original.AssignedRange)
+            && server.Dns.Equals(original.Dns)
+            && server.Endpoint.Equals(original.Endpoint)
+            && server.ListenPort == original.ListenPort
+            && server.PublicKey.Equals(original.PublicKey));
+    }
+}

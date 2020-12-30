@@ -19,11 +19,11 @@ namespace Whyvra.Tunnel.Core.Servers.Commands
         public async Task<Unit> Handle(RemoveAddressFromServerCommand command, CancellationToken cancellationToken)
         {
             var serverAddress = await _context.ServerNetworkAddresses
-                .SingleOrDefaultAsync(x => x.NetworkAddressId == command.NetworkAddressId && x.ServerId == command.ServerId);
+                .SingleOrDefaultAsync(x => x.NetworkAddressId == command.NetworkAddressId && x.ServerId == command.ServerId, cancellationToken);
 
             if (serverAddress == null)
             {
-                throw new NullReferenceException($"Cannot find network address #{command.NetworkAddressId} on server #{command.ServerId}.");
+                throw new NullReferenceException($"A network address #{command.NetworkAddressId} on server #{command.ServerId} could not be found.");
             }
 
             _context.ServerNetworkAddresses.Remove(serverAddress);

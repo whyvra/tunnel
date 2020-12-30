@@ -38,7 +38,7 @@ namespace Whyvra.Tunnel.Core.Clients.Queries
                 })
                 .SingleOrDefaultAsync(x => x.Id == query.Id, cancellationToken);
 
-            if (client == null) throw new NullReferenceException($"Cannot find client with id #{query.Id}");
+            if (client == null) throw new NullReferenceException($"A client with id #{query.Id} could not be found");
 
             return client;
         }

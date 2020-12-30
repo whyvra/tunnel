@@ -25,7 +25,7 @@ namespace Whyvra.Tunnel.Core.Servers.Commands
                 .SingleOrDefaultAsync(x => x.Id == command.Id, cancellationToken);
 
             // Throw an error if not found
-            if (server == null) throw new NullReferenceException($"Cannot find server with id #{command.Id}");
+            if (server == null) throw new NullReferenceException($"A server with id #{command.Id} could not be found.");
 
             // Ensure name is unique
             var exists = await _context.Servers.AnyAsync(x => x.Name == command.Server.Name && x.Id != command.Id, cancellationToken);

@@ -1,11 +1,11 @@
 @using System.Net
 [Interface]
-Address = @GetFirstUsage(Server.AssignedRange)
+Address = @GetFirstUsable(Server.AssignedRange)
 ListenPort = @Server.ListenPort
 PrivateKey = @((MarkupString) "<SERVER PRIVATE KEY>")
 
-PostUp = iptables -A FORWARD -i %i -j ACCEPT; iptables -t nat -A POSTROUTING -o eth0 -j MAS>
-PostDown = iptables -D FORWARD -i %i -j ACCEPT; iptables -t nat -D POSTROUTING -o eth0 -j M>
+PostUp = iptables -A FORWARD -i %i -j ACCEPT; iptables -t nat -A POSTROUTING -o eth0 -j MASQUERADE
+PostDown = iptables -D FORWARD -i %i -j ACCEPT; iptables -t nat -D POSTROUTING -o eth0 -j MASQUERADE
 
 @foreach (var client in Clients)
 {
@@ -18,10 +18,10 @@ PostDown = iptables -D FORWARD -i %i -j ACCEPT; iptables -t nat -D POSTROUTING -
     [Parameter]
     public ServerDto Server { get; set; }
 
-    private string GetFirstUsage(string ipRange)
+    private string GetFirstUsable(string ipRange)
     {
         var network = IPNetwork.Parse(ipRange);
-        return network.FirstUsable.ToString();
+        return $"{network.FirstUsable.ToString()}/{network.Cidr}";
     }
 
     private string GetPeer(ClientDto client)

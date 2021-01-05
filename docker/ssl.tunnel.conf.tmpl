@@ -1,0 +1,36 @@
+upstream tunnel {
+    server localhost:5000;
+}
+
+server {
+    listen 5800 ssl default_server;
+    listen [::]:5800 ssl default_server;
+
+    include /etc/nginx/ssl.conf;
+
+    # ssl certificate
+    ssl_certificate ${SSL_CERT};
+    ssl_certificate_key ${SSL_KEY};
+
+    location /api {
+        proxy_pass       http://tunnel/api;
+        proxy_set_header Host      §host;
+        proxy_set_header X-Real-IP §remote_addr;
+    }
+
+    location /swagger {
+        proxy_pass       http://tunnel/swagger;
+        proxy_set_header Host      §host;
+        proxy_set_header X-Real-IP §remote_addr;
+    }
+
+    location / {
+        root      /srv/www;
+        try_files §uri §uri/ /index.html =404;
+
+        location /_framework {
+            brotli_static on;
+            gzip_static on;
+        }
+    }
+}

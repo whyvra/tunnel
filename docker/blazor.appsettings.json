@@ -1,0 +1,8 @@
+{
+  "api": {
+    "url": "/api"
+  },
+  "auth": {
+    "enabled": false
+  }
+}

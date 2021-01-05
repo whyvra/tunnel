@@ -22,6 +22,7 @@ namespace Whyvra.Tunnel.Api
                         Console.WriteLine($"Loading custom configuration : {custom}");
                         config.AddJsonFile(custom);
                     }
+                    config.AddEnvironmentVariables();
                 })
                 .ConfigureWebHostDefaults(webBuilder => webBuilder
                     .UseSerilog((context, loggerConfiguration) =>

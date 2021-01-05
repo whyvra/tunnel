@@ -9,7 +9,5 @@ namespace Whyvra.Tunnel.Common.Configuration
         public bool Enabled { get; set; }
 
         public string RequiredRole { get; set; }
-
-        public string ResponseType { get; set; } = "code";
     }
 }

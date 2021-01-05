@@ -53,7 +53,13 @@ namespace Whyvra.Tunnel.Presentation
                 builder.Services
                     .AddScoped<IdTokenProvider>()
                     .AddScoped<CustomAuthorizationMessageHandler>()
-                    .AddOidcAuthentication(x => builder.Configuration.Bind("auth", x.ProviderOptions));
+                    .AddOidcAuthentication(x => {
+                        builder.Configuration.Bind("auth", x.ProviderOptions);
+                        if (string.IsNullOrWhiteSpace(x.ProviderOptions.ResponseType))
+                        {
+                            x.ProviderOptions.ResponseType = "code";
+                        }
+                    });
 
                 // Add authorization handler if authentication is enabled
                 apiClient.AddHttpMessageHandler<CustomAuthorizationMessageHandler>();

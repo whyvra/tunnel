@@ -111,8 +111,6 @@ namespace Whyvra.Tunnel.Api
                 context.Database.Migrate();
             }
 
-            app.UseHttpsRedirection();
-
             app.UseSwagger();
             app.UseSwaggerUI(x => x.SwaggerEndpoint("/swagger/v1/swagger.json", Assembly.GetExecutingAssembly().GetName().Name));
 

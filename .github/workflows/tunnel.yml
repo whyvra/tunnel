@@ -1,0 +1,50 @@
+name: Tunnel
+
+# Triggers the workflow when pushing to master
+on:
+  push:
+    branches:
+      - master
+
+jobs:
+  build-code:
+    environment: Docker Hub
+    runs-on: ubuntu-18.04
+    env:
+      DOTNET_CLI_TELEMETRY_OPTOUT: true
+      DOTNET_NOLOGO: true
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
+
+      - name: Install versioning tool
+        run: dotnet tool install --global Whyvra.GitV
+
+      - name: Calculate version
+        run: |
+          echo "AssemblyVersion=$(gitv -a)" >> $GITHUB_ENV
+          echo "ModuleVersion=$(gitv)" >> $GITHUB_ENV
+          echo "MajorMinVersion=$(gitv | cut -f1,2 -d '.')" >> $GITHUB_ENV
+
+      - name: Build code
+        run: |
+          dotnet restore -r linux-musl-x64
+          dotnet publish Whyvra.Tunnel.Api -c Release -o Build/api -f netcoreapp3.1 --self-contained false -r linux-musl-x64 --no-restore -p:Version=$AssemblyVersion
+          dotnet publish Whyvra.Tunnel.Presentation -c Release -o Build --no-restore -p:Version=$AssemblyVersion
+
+      - name: Build Docker image
+        run: docker build --tag whyvra/tunnel:latest --tag whyvra/tunnel:$ModuleVersion --tag whyvra/tunnel:$MajorMinVersion .
+
+      - name: DockerHub Login
+        uses: docker/login-action@v1
+        with:
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_PASSWORD }}
+
+      - name: Push to Docker Hub
+        run: |
+          docker push whyvra/tunnel:latest
+          docker push whyvra/tunnel:$ModuleVersion
+          docker push whyvra/tunnel:$MajorMinVersion

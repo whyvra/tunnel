@@ -1,5 +1,7 @@
 # tunnel
 
+[![Tunnel Build](https://img.shields.io/github/workflow/status/whyvra/tunnel/Tunnel?style=flat-square)](https://github.com/whyvra/tunnel/actions)
+[![Docker Pulls](https://img.shields.io/docker/pulls/whyvra/tunnel?style=flat-square)](https://hub.docker.com/r/whyvra/tunnel)
 [![LICENSE](https://img.shields.io/badge/license-MIT-blue?style=flat-square)](https://github.com/whyvra/tunnel/blob/master/LICENSE)
 [![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg?style=flat-square)](http://makeapullrequest.com)
 

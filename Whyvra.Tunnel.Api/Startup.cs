@@ -3,6 +3,7 @@ using System.Text.Json;
 using FluentValidation.AspNetCore;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.AspNetCore.Mvc.ApplicationModels;
 using Microsoft.AspNetCore.Mvc.Authorization;
 using Microsoft.EntityFrameworkCore;
@@ -65,6 +66,12 @@ namespace Whyvra.Tunnel.Api
                 })
                 .ConfigureApplicationPartManager(x => x.FeatureProviders.Add(new AuthenticationFeatureProvider(authOptions.Enabled)));
 
+            services.Configure<ForwardedHeadersOptions>(x =>
+            {
+                x.ForwardLimit = 2;
+                x.ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto;
+            });
+
             // Register handlers
             services.AddTunnelHandlers();
 
@@ -110,6 +117,8 @@ namespace Whyvra.Tunnel.Api
 
                 context.Database.Migrate();
             }
+
+            app.UseForwardedHeaders();
 
             app.UseSwagger();
             app.UseSwaggerUI(x => x.SwaggerEndpoint("/swagger/v1/swagger.json", Assembly.GetExecutingAssembly().GetName().Name));

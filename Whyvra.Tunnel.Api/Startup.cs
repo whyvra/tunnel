@@ -68,8 +68,13 @@ namespace Whyvra.Tunnel.Api
 
             services.Configure<ForwardedHeadersOptions>(x =>
             {
-                x.ForwardLimit = 2;
+                x.ForwardLimit = 3;
                 x.ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto;
+
+                // Clear default as this relies heavily on your network infrastructure
+                // and causes complications with Docker
+                x.KnownNetworks.Clear();
+                x.KnownProxies.Clear();
             });
 
             // Register handlers

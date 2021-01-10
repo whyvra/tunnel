@@ -14,7 +14,7 @@
                 <label for="@(field.Name)">@(field.DisplayName)</label>
                 <div class="control">
                     <textarea id="@(field.Name)" class="textarea has-fixed-size @(FormViewMode == FormViewMode.Readonly ? "is-static" : "")"
-                        placeholder="@(field.DisplayName)" value="@(field.Getter(FormModel.DataModel) ?? string.Empty)"
+                        placeholder="@(field.Placeholder)" value="@(field.Getter(FormModel.DataModel) ?? string.Empty)"
                         @onchange="@(async (e) => await HandleChange(field, e))" readonly="@(FormViewMode == FormViewMode.Readonly)"
                         rows="@(area.Rows.HasValue ? $"{area.Rows.Value}" : "")"
                         columns="@(area.Columns.HasValue ? $"{area.Columns.Value}" : "")"
@@ -36,7 +36,7 @@
                         Data="@(field.Getter(FormModel.DataModel) as IEnumerable<string>)"
                         EmptyValue="@tag.EmptyValue"
                         IsReadOnly="@(FormViewMode == FormViewMode.Readonly)"
-                        Placeholder="@(tag.DisplayName)"
+                        Placeholder="@(tag.Placeholder)"
                         DataChanged="@((tags) => tag.Setter(FormModel.DataModel, tags))" />
                     @if (_isValidationEnabled)
                     {
@@ -64,7 +64,7 @@
                 <label for="@(field.Name)">@(field.DisplayName)</label>
                 <p class="control @(field.Icon != null ? "has-icons-left" : "")">
                     <input id="@(field.Name)" class="input @(FormViewMode == FormViewMode.Readonly ? "is-static" : "")" type="number"
-                        placeholder="@(field.DisplayName)" value="@(field.Getter(FormModel.DataModel))"
+                        placeholder="@(field.Placeholder)" value="@(field.Getter(FormModel.DataModel))"
                         @onchange="@((e) => HandleNumber(number, e))" readonly="@(FormViewMode == FormViewMode.Readonly)"
                         @onfocusout="@(() => TriggerValidation(field))" >
                     @if (field.Icon != null)
@@ -85,7 +85,7 @@
                 <label for="@(field.Name)">@(field.DisplayName)</label>
                 <p class="control @(field.Icon != null ? "has-icons-left" : "")">
                     <input id="@(field.Name)" class="input @(FormViewMode == FormViewMode.Readonly ? "is-static" : "")" type="text"
-                        placeholder="@(field.DisplayName)" value="@(field.Getter(FormModel.DataModel))"
+                        placeholder="@(field.Placeholder)" value="@(field.Getter(FormModel.DataModel))"
                         @onchange="@(async (e) => await HandleChange(field, e))" readonly="@(FormViewMode == FormViewMode.Readonly)"
                         @onfocusout="@(() => TriggerValidation(field))" >
                     @if (field.Icon != null)

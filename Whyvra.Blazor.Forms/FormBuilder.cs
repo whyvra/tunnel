@@ -97,12 +97,14 @@ namespace Whyvra.Blazor.Forms
             var name = propertyInfo.Name;
 
             var exprPath = propertyLambda.ToString();
+            var displayName = AddSpaces(name);
 
             var input = new Input
             {
                 Name = name,
-                DisplayName = AddSpaces(name),
+                DisplayName = displayName,
                 Getter = propertyLambda.GetGetter(),
+                Placeholder = displayName,
                 Setter = propertyLambda.GetSetter(),
                 ValidationPath = exprPath.Substring(exprPath.IndexOf('.') + 1)
             };
@@ -185,12 +187,14 @@ namespace Whyvra.Blazor.Forms
             var name = propertyInfo.Name;
 
             var exprPath = propertyLambda.ToString();
+            var displayName = AddSpaces(name);
 
             var tags = new TagsInput
             {
                 Name = name,
-                DisplayName = AddSpaces(name),
+                DisplayName = displayName,
                 Getter = propertyLambda.GetGetter(),
+                Placeholder = displayName,
                 Setter = propertyLambda.GetSetter(),
                 ValidationPath = exprPath.Substring(exprPath.IndexOf('.') + 1)
             };
@@ -208,6 +212,7 @@ namespace Whyvra.Blazor.Forms
             var name = propertyInfo.Name;
 
             var exprPath = propertyLambda.ToString();
+            var displayName = AddSpaces(name);
 
             var input = new TextArea
             {
@@ -215,6 +220,7 @@ namespace Whyvra.Blazor.Forms
                 Columns = columns,
                 DisplayName = AddSpaces(name),
                 Getter = propertyLambda.GetGetter(),
+                Placeholder = displayName,
                 Rows = rows,
                 Setter = propertyLambda.GetSetter(),
                 ValidationPath = exprPath.Substring(exprPath.IndexOf('.') + 1)
@@ -262,12 +268,24 @@ namespace Whyvra.Blazor.Forms
             return this;
         }
 
+        public FormBuilder<TModel> WithPlaceholder(string placeholder)
+        {
+            var field = _fields[_activeField];
+            if (field is Input input)
+            {
+                input.Placeholder = placeholder;
+            }
+
+            return this;
+        }
+
         public FormBuilder<TModel> WithText(string text)
         {
             var field = _fields[_activeField];
             if (field is Input input)
             {
                 input.DisplayName = text;
+                input.Placeholder = text;
             }
 
             return this;

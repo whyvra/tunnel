@@ -9,6 +9,19 @@ The secure manager for your WireGuard clients
 
 <img src="https://raw.githubusercontent.com/whyvra/tunnel/master/docs/sample.gif" width="900">
 
+## Table of contents
+
+* [Purpose](#purpose)
+* [Usage](#usage)
+* [Configuration](#configuration)
+* [API settings](#api-settings)
+* [Blazor settings](#blazor-settings)
+* [SSL](#ssl)
+* [Database](#database)
+* [Authentication](#authentication)
+* [docker-compose](#docker-compose)
+* [License](#license)
+
 ## Purpose
 
 Tunnel is a secure manager for your WireGuard clients' configuration. It is not meant to manage your server's and your clients' private keys. Your server's private key should be stored securely on your server and your clients' private keys should be stored on their devices only. Tunnel does not automatically update your WireGuard configuration on the file system nor does it manage the WireGuard services.
@@ -22,7 +35,7 @@ The QR Code and WireGuard config file are only available when you first add the 
 The simplest way to get started is to use the docker image.
 
 ```bash
-docker run --it --rm -p "5800:5800" whyvra/tunnel
+docker run -it --rm -p "5800:5800" whyvra/tunnel
 ```
 
 You should now be able to access tunnel via `http://localhost:5800/`
@@ -141,6 +154,108 @@ The `requiredRole` parameter is optional. If provided, it will require the logge
 The `responseType` parameter is only required for the Blazor settings. It will default to `code` if omitted. Should it be provided to the API settings, it will just be ignored.
 
 Please note that if you have an SSL certificate issued by a custom or internal CA on your Open ID connect server, you will need to add or mount the root CA certificate under `/etc/ssl/certs`.
+
+## docker-compose
+
+Detailed below is a docker-compose example making use of PostgreSQL as the backend database and Keycloak (Open ID Connect server) for authentication. This example has been tested using `docker stack`.
+
+### Folder structure:
+```
+.
+├── appsettings.json
+├── data (data folder for tunnel)
+├── docker-compose.yml
+├── init_script.sql
+├── pgdata (folder for postgres data)
+└── ssl
+    ├── tls.crt
+    └── tls.key
+```
+
+The `tls.crt` and `tls.key` can be generated with the following commands. Please note that the certificate should answer to `keycloak.lan` or whatever hostname you choose to replace it with.
+
+```bash
+$ openssl genpkey -algorithm RSA -pkeyopt rsa_keygen_bits:4096 -out tls.key
+$ openssl req -key tls.key -x509 -new -days 720 -out tls.crt
+```
+
+```yaml
+# docker-compose.yml
+version: '3.5'
+
+services:
+
+  postgres:
+    image: postgres:13-alpine
+    hostname: postgres
+    environment:
+    - POSTGRES_PASSWORD=postgres
+    - PGDATA=/var/lib/postgresql/data/pgdata
+    volumes:
+    - ./pgdata:/var/lib/postgresql/data/pgdata
+    - ./init_script.sql:/docker-entrypoint-initdb.d/init_script.sql
+
+  keycloak:
+    image: jboss/keycloak:latest
+    hostname: keycloak
+    depends_on:
+    - postgres
+    environment:
+    - DB_VENDOR=postgres
+    - DB_ADDR=postgres
+    - DB_PORT=5432
+    - DB_USER=postgres
+    - DB_PASSWORD=postgres
+    - KEYCLOAK_USER=admin
+    - KEYCLOAK_PASSWORD=admin
+    - KEYCLOAK_LOGLEVEL=WARN
+    - ROOT_LOGLEVEL=WARN
+    volumes:
+    - ./ssl:/etc/x509/https
+    ports:
+    - "8443:8443"
+
+  tunnel:
+    image: whyvra/tunnel:0.1
+    hostname: wg-tunnel
+    depends_on:
+    - postgres
+    - keycloak
+    environment:
+    - database__type=postgres
+    - ConnectionStrings__TunnelContext=Host=postgres;Database=tunnel;Username=postgres;Password=postgres;
+    - auth__enabled=true
+    - auth__authority=https://keycloak.lan:8443/auth/realms/apps
+    - auth__clientId=wg_tunnel
+    - auth__requiredRole=wg_admin
+    volumes:
+    - ./data:/data:rw
+    - ./appsettings.json:/srv/www/appsettings.json
+    - ./ssl/tls.crt:/etc/ssl/certs/tls.crt
+    ports:
+    - "5800:5800"
+```
+
+```json
+// appsettings.json
+{
+  "api": {
+    "url": "/api"
+  },
+  "auth": {
+    "authority": "https://keycloak.lan:8443/auth/realms/apps",
+    "clientId": "wg_tunnel",
+    "enabled": true,
+    "requiredRole": "wg_admin"
+  }
+}
+```
+
+```sql
+# init_script.sql
+CREATE DATABASE keycloak;
+CREATE DATABASE tunnel;
+```
 
 ## License
 

@@ -51,7 +51,7 @@ namespace Whyvra.Tunnel.Api
                 AddControllers(x =>
                 {
                     x.Conventions.Add(new RouteTokenTransformerConvention(new SlugifyParameterTransformer()));
-                    x.Filters.Add(new HttpExceptionFilter());
+                    x.Filters.Add<HttpExceptionFilter>();
                     x.Filters.Add(new ValidationFilter());
                     if (authOptions.Enabled)
                     {

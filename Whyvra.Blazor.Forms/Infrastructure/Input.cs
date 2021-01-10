@@ -18,6 +18,8 @@ namespace Whyvra.Blazor.Forms.Infrastructure
 
         public EventHandler<ChangeEventArgs> OnChangeHandler { get; set; }
 
+        public string Placeholder { get; set; }
+
         public IEnumerable<string> ValidationMessages { get; set; } = new List<string>();
 
         public string ValidationPath { get; set; }

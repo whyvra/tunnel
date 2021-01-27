@@ -25,7 +25,7 @@ namespace Whyvra.Tunnel.Core.NetworkAddress.Queries
                 .Select(x => new NetworkAddressDto
                 {
                     Id = x.Id,
-                    Address = $"{x.Address.addr}/{x.Address.cidr}"
+                    Address = TunnelFunctions.Text(x.Address)
                 })
                 .ToListAsync(cancellationToken);
         }

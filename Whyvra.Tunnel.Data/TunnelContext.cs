@@ -1,9 +1,12 @@
 using System;
+using System.Data;
 using System.Linq;
 using System.Reflection;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Query.SqlExpressions;
+using Microsoft.EntityFrameworkCore.Storage;
 using Whyvra.Tunnel.Data.Configuration;
 using Whyvra.Tunnel.Domain;
 using Whyvra.Tunnel.Domain.Entitites;
@@ -42,9 +45,25 @@ namespace Whyvra.Tunnel.Data
             base.OnModelCreating(modelBuilder);
             modelBuilder.ApplyConfigurationsFromAssembly(Assembly.GetExecutingAssembly());
 
+            var method = typeof(TunnelFunctions)
+                .GetRuntimeMethod(nameof(TunnelFunctions.Text), new [] { typeof((System.Net.IPAddress, int)) });
+
             if (Database.ProviderName == "Microsoft.EntityFrameworkCore.Sqlite")
             {
                 modelBuilder.ApplyDataFixForSqlite();
+                modelBuilder.HasDbFunction(method, builder => builder.HasName("LOWER").HasParameter("cidr").HasStoreType("string"));
+            }
+            else {
+                modelBuilder
+                    .HasDbFunction(method)
+                    .HasTranslation(args => new SqlFunctionExpression(
+                        "TEXT",
+                        args,
+                        nullable: true,
+                        argumentsPropagateNullability: Enumerable.Repeat(true, args.Count),
+                        typeof(string),
+                        new StringTypeMapping("string", DbType.String)
+                    ));
             }
         }
 

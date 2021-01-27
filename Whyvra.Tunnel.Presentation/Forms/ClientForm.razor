@@ -1,6 +1,6 @@
 @using System.Text.Json
 @using FluentValidation
-@using Whyvra.Blazor.Forms.Renderer
+@using Whyvra.Blazor.Forms.Renderers
 
 @implements IDisposable
 
@@ -51,19 +51,20 @@ else if (_formModel != null)
             {
                 <Notification NotificationDto="@_notification" OnClose="@(() => _notification.IsVisible = false)"></Notification>
             }
-            <BulmaForm @ref="_form" FormModel="_formModel" FormViewMode="_formMode"></BulmaForm>
+            <BulmaForm @ref="_form" FormModel="_formModel" FormState="_formState" GetValidationMessages="GetValidationMessages">
+            </BulmaForm>
         </ChildContent>
         <Buttons>
-            @if (_formMode == FormViewMode.Readonly)
+            @if (_formState == FormState.ReadOnly)
             {
-                <button class="button is-warning" @onclick="@(() => _formMode = FormViewMode.Edit)">
+                <button class="button is-warning" @onclick="@(() => _formState = FormState.Edit)">
                     <span class="icon">
                         <i class="fas fa-pencil-alt"></i>
                     </span>
                     <span>Edit</span>
                 </button>
             }
-            @if (_formMode != FormViewMode.Readonly)
+            @if (_formState != FormState.ReadOnly)
             {
                 <button class="button is-primary" @onclick="SaveChanges">
                     <span class="icon">
@@ -74,7 +75,7 @@ else if (_formModel != null)
             }
             @if (!_isRevoked)
             {
-                <button class="button is-primary" disabled="@(_formMode == FormViewMode.Edit)" @onclick="Revoke">
+                <button class="button is-primary" disabled="@(_formState == FormState.Edit)" @onclick="Revoke">
                     <span class="icon">
                         <i class="fas fa-ban"></i>
                     </span>
@@ -83,14 +84,14 @@ else if (_formModel != null)
             }
             else
             {
-                <button class="button is-primary" disabled="@(_formMode == FormViewMode.Edit)" @onclick="Reinstate">
+                <button class="button is-primary" disabled="@(_formState == FormState.Edit)" @onclick="Reinstate">
                     <span class="icon">
                         <i class="fas fa-gavel"></i>
                     </span>
                     <span>Reinstate</span>
                 </button>
             }
-            <button class="button is-danger" disabled="@(_formMode == FormViewMode.Edit)" @onclick="@(() => _showDeleteConfirm = true)">
+            <button class="button is-danger" disabled="@(_formState == FormState.Edit)" @onclick="@(() => _showDeleteConfirm = true)">
                 <span class="icon">
                     <i class="fas fa-trash-alt"></i>
                 </span>
@@ -109,16 +110,16 @@ else if (_formModel != null)
 @code
 {
     private string _copy;
-    private BulmaForm<UpdateClientViewModel> _form;
-    private FormViewMode _currentFormMode = FormViewMode.Readonly;
-    private FormViewMode _previousFormMode = FormViewMode.Readonly;
-    private FormViewMode _formMode
+    private IFormRenderer _form;
+    private FormState _currentFormState = FormState.ReadOnly;
+    private FormState _previousFormState = FormState.ReadOnly;
+    private FormState _formState
     {
-        get { return _currentFormMode; }
+        get { return _currentFormState; }
         set
         {
-            _previousFormMode = _currentFormMode;
-            _currentFormMode = value;
+            _previousFormState = _currentFormState;
+            _currentFormState = value;
         }
     }
     private FormModel<UpdateClientViewModel> _formModel;
@@ -170,7 +171,7 @@ else if (_formModel != null)
             .Input(x => x.Client.Name).WithIcon("user")
             .TextArea(x => x.Client.Description)
             .Input(x => x.Client.AssignedIp).WithIcon("network-wired").WithText("Assigned IP")
-            .TagsInput(x => x.AllowedIps).WithText("Allowed IPs").WithDefaultEmptyValue("No IPs allowed")
+            .TagsInput(x => x.AllowedIps).WithText("Allowed IPs").WithEmptyValue("No IPs allowed")
             .Input(x => x.Client.PublicKey).WithIcon("key")
             .WithModel(viewModel)
             .Build();
@@ -190,6 +191,15 @@ else if (_formModel != null)
         ExceptionHandler.OnUnhandledException -= HandleException;
     }
 
+    public IEnumerable<string> GetValidationMessages(string key)
+    {
+        var result = Validator.Validate(_formModel.DataModel);
+
+        return result.Errors
+            .Where(x => x.PropertyName.Equals(key))
+            .Select(x => x.ErrorMessage);
+    }
+
     private async Task HandleClose()
     {
         await OnClose.InvokeAsync(false);
@@ -197,7 +207,7 @@ else if (_formModel != null)
 
     private void HandleException(object sender, Exception e)
     {
-        _formMode = _previousFormMode;
+        _formState = _previousFormState;
         _isLoading = false;
         _notification = new NotificationDto
         {
@@ -241,7 +251,7 @@ else if (_formModel != null)
         if (!result.IsValid)
         {
             // Show validation message
-            _form.Validate();
+            _form.ValidateForm();
             _notification = new NotificationDto
             {
                 Icon = "exclamation-triangle",
@@ -253,7 +263,7 @@ else if (_formModel != null)
             return;
         }
 
-        _formMode = FormViewMode.Readonly;
+        _formState = FormState.ReadOnly;
         _isLoading = true;
         var updated = false;
 

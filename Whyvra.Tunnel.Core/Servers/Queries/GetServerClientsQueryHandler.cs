@@ -28,7 +28,7 @@ namespace Whyvra.Tunnel.Core.Servers.Queries
                     Id = x.Id,
                     Name = x.Name,
                     Description = x.Description,
-                    AssignedIp = $"{x.AssignedIp.addr}/{x.AssignedIp.cidr}",
+                    AssignedIp = TunnelFunctions.Text(x.AssignedIp),
                     PublicKey = x.PublicKey
                 })
                 .ToListAsync(cancellationToken);

@@ -1,5 +1,5 @@
 using System.Collections.Generic;
-using Bunit;
+using Blazorme;
 using Whyvra.Tunnel.Common.Models;
 using Whyvra.Tunnel.Presentation.Templates;
 using Whyvra.Tunnel.Presentation.ViewModels;
@@ -8,27 +8,33 @@ namespace Whyvra.Tunnel.Presentation.Services
 {
     public class TemplateService
     {
-        private readonly TestContext _context;
+        private readonly TestHost _host;
 
-        public TemplateService(TestContext context)
+        public TemplateService(TestHost host)
         {
-            _context = context;
+            _host = host;
         }
 
         public string RenderClientConfiguration(ClientConfigurationViewModel viewModel)
         {
-            var parameter = ComponentParameterFactory.Parameter("Model", viewModel);
-            var component = _context.RenderComponent<ClientConfiguration>(parameter);
+            var parameters = new Dictionary<string, object>()
+            {
+                { nameof(ClientConfiguration.Model), viewModel }
+            };
+            var component = _host.AddComponent<ClientConfiguration>(parameters);
 
-            return component.Markup;
+            return component.GetMarkup();
         }
 
         public string RenderServerConfiguration(ServerDto server, IEnumerable<ClientDto> clients)
         {
-            var serverParameter = ComponentParameterFactory.Parameter("Server", server);
-            var clientsParameter = ComponentParameterFactory.Parameter("Clients", clients);
-            var component = _context.RenderComponent<ServerConfiguration>(serverParameter, clientsParameter);
-            return component.Markup.Trim();
+            var parameters = new Dictionary<string, object>()
+            {
+                { nameof(ServerConfiguration.Server), server },
+                { nameof(ServerConfiguration.Clients), clients }
+            };
+            var component = _host.AddComponent<ServerConfiguration>(parameters);
+            return component.GetMarkup().Trim();
         }
     }
 }

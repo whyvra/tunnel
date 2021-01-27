@@ -1,3 +1,4 @@
+using System;
 using Microsoft.Extensions.Logging;
 
 namespace Whyvra.Tunnel.Presentation.Logging
@@ -18,6 +19,7 @@ namespace Whyvra.Tunnel.Presentation.Logging
 
         public void Dispose()
         {
+            GC.SuppressFinalize(this);
         }
     }
 }

@@ -27,7 +27,7 @@ namespace Whyvra.Tunnel.Core.Servers.Queries
                     Id = x.Id,
                     Name = x.Name,
                     Description = x.Description,
-                    AssignedRange = $"{x.AssignedRange.addr}/{x.AssignedRange.cidr}",
+                    AssignedRange = TunnelFunctions.Text(x.AssignedRange),
                     Clients = x.Clients
                         .Where(c => !c.IsRevoked)
                         .Select(c => new ClientDto
@@ -38,7 +38,7 @@ namespace Whyvra.Tunnel.Core.Servers.Queries
                         })
                         .ToList(),
                     DefaultAllowedRange = x.DefaultAllowedRange
-                        .Select(n => $"{n.NetworkAddress.Address.addr}/{n.NetworkAddress.Address.cidr}")
+                        .Select(n => TunnelFunctions.Text(n.NetworkAddress.Address))
                         .ToList(),
                     Dns = x.Dns.ToString(),
                     Endpoint = x.Endpoint,
@@ -47,6 +47,7 @@ namespace Whyvra.Tunnel.Core.Servers.Queries
                     CreatedAt = x.CreatedAt,
                     UpdatedAt = x.UpdatedAt
                 })
+                .AsSingleQuery()
                 .SingleOrDefaultAsync(x => x.Id == query.Id, cancellationToken);
 
             if (server == null) throw new NullReferenceException($"A server with id #{query.Id} could not be found.");

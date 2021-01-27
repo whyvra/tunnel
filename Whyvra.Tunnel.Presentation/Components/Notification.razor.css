@@ -1,0 +1,6 @@
+.is-shrinkable .level-left,
+.is-shrinkable .level-left .level-item,
+.is-shrinkable .level-right
+.is-shrinkable .level-right .level-item {
+    flex-shrink: 1;
+}

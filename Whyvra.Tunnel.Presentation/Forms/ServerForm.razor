@@ -1,6 +1,6 @@
 @using System.Text.Json
 @using FluentValidation
-@using Whyvra.Blazor.Forms.Renderer
+@using Whyvra.Blazor.Forms.Renderers
 
 @implements IDisposable
 
@@ -51,19 +51,20 @@ else if (_formModel != null)
             {
                 <Notification NotificationDto="@_notification" OnClose="@(() => _notification.IsVisible = false)"></Notification>
             }
-            <BulmaForm @ref="_form" FormModel="@_formModel" FormViewMode="@_formViewMode"></BulmaForm>
+            <BulmaForm @ref="_form" FormModel="@_formModel" FormState="@_formViewMode" GetValidationMessages="GetValidationMessages">
+            </BulmaForm>
         </ChildContent>
         <Buttons>
-            @if (_formViewMode == FormViewMode.Readonly)
+            @if (_formViewMode == FormState.ReadOnly)
             {
-                <button class="button is-warning" @onclick="@(() => _formViewMode = FormViewMode.Edit)">
+                <button class="button is-warning" @onclick="@(() => _formViewMode = FormState.Edit)">
                     <span class="icon">
                         <i class="fas fa-pencil-alt"></i>
                     </span>
                     <span>Edit</span>
                 </button>
             }
-            @if (_formViewMode != FormViewMode.Readonly)
+            @if (_formViewMode != FormState.ReadOnly)
             {
                 <button class="button is-primary" @onclick="SaveChanges">
                     <span class="icon">
@@ -72,7 +73,7 @@ else if (_formModel != null)
                     <span>Save changes</span>
                 </button>
             }
-            @if (_formViewMode != FormViewMode.Blank)
+            @if (_formViewMode != FormState.New)
             {
                 <button class="button is-danger" @onclick="@(() => _showDeleteConfirm = true)">
                     <span class="icon">
@@ -95,9 +96,9 @@ else if (_formModel != null)
 {
     private string _copy;
     private ServerDto _server;
-    private BulmaForm<ServerViewModel> _form;
+    private IFormRenderer _form;
     private FormModel<ServerViewModel> _formModel;
-    private FormViewMode _formViewMode = FormViewMode.Readonly;
+    private FormState _formViewMode = FormState.ReadOnly;
     private bool _isLoading;
     private NotificationDto _notification { get; set; } = new NotificationDto();
     private bool _showDeleteConfirm;
@@ -117,7 +118,7 @@ else if (_formModel != null)
             .Input(x => x.Server.Name).WithIcon("server")
             .TextArea(x => x.Server.Description, rows: 3)
             .Input(x => x.Server.AssignedRange).WithText("Assigned IP Range").WithIcon("network-wired").WithPlaceholder("e.g. 10.200.10.0/24")
-            .TagsInput(x => x.DefaultAllowedRange).WithDefaultEmptyValue("No IP range has been assigned").WithPlaceholder("Comma-seperated list of address ranges e.g. 0.0.0.0/0, ::/0,")
+            .TagsInput(x => x.DefaultAllowedRange).WithEmptyValue("No IP range has been assigned").WithPlaceholder("Comma-seperated list of address ranges e.g. 0.0.0.0/0, ::/0,")
             .Input(x => x.Server.Dns).WithText("DNS").WithIcon("address-book")
             .Input(x => x.Server.Endpoint).WithIcon("globe").WithPlaceholder("<IP Address | domain>:<port number> e.g. domain.xyz:53")
             .Number(x => x.Server.ListenPort).WithText("Port to listen").WithIcon("ethernet")
@@ -150,7 +151,7 @@ else if (_formModel != null)
         }
         else
         {
-            _formViewMode = FormViewMode.Blank;
+            _formViewMode = FormState.New;
         }
 
         _formModel = fb.Build();
@@ -172,6 +173,15 @@ else if (_formModel != null)
     public void Dispose()
     {
         ExceptionHandler.OnUnhandledException -= HandleException;
+    }
+
+    public IEnumerable<string> GetValidationMessages(string key)
+    {
+        var result = Validator.Validate(_formModel.DataModel);
+
+        return result.Errors
+            .Where(x => x.PropertyName.Equals(key))
+            .Select(x => x.ErrorMessage);
     }
 
     private void HandleException(object sender, Exception e)
@@ -201,7 +211,7 @@ else if (_formModel != null)
 
         if (!result.IsValid)
         {
-            _form.Validate();
+            _form.ValidateForm();
             _notification = new NotificationDto
             {
                 Icon = "exclamation-triangle",
@@ -220,11 +230,11 @@ else if (_formModel != null)
             _server = null;
             var wasUpdated = false;
 
-            if (_formViewMode == FormViewMode.Edit && ServerId.HasValue)
+            if (_formViewMode == FormState.Edit && ServerId.HasValue)
             {
                 wasUpdated = await Update(model, ServerId.Value);
             }
-            else if (_formViewMode == FormViewMode.Blank)
+            else if (_formViewMode == FormState.New)
             {
                 var id = await ServerService.CreateNew(model.Server);
                 wasUpdated = true;

@@ -17,7 +17,7 @@ namespace Whyvra.Tunnel.Data.Configuration
                     x => JsonDocument.Parse(x, new JsonDocumentOptions())
                 );
 
-                modelBuilder.Entity<NetworkAddress>().Property(x => x.Address)
+            modelBuilder.Entity<NetworkAddress>().Property(x => x.Address)
                 .HasConversion(
                     x => $"{x.addr}/{x.cidr}",
                     x => x.ToAddress()
@@ -50,13 +50,13 @@ namespace Whyvra.Tunnel.Data.Configuration
 
         public static string ToJsonString(this JsonDocument json)
         {
-            using (var stream = new MemoryStream())
-            {
-                var writer = new Utf8JsonWriter(stream, new JsonWriterOptions { Indented = false });
-                json.WriteTo(writer);
-                writer.Flush();
-                return Encoding.UTF8.GetString(stream.ToArray());
-            }
+            using var stream = new MemoryStream();
+            var writer = new Utf8JsonWriter(stream, new JsonWriterOptions { Indented = false });
+
+            json.WriteTo(writer);
+            writer.Flush();
+
+            return Encoding.UTF8.GetString(stream.ToArray());
         }
     }
 }

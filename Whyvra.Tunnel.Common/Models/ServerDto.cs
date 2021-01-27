@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace Whyvra.Tunnel.Common.Models
 {
@@ -15,7 +16,7 @@ namespace Whyvra.Tunnel.Common.Models
 
         public IEnumerable<ClientDto> Clients { get; set; }
 
-        public IEnumerable<string> DefaultAllowedRange { get; set; }
+        public IEnumerable<string> DefaultAllowedRange { get; set; } = Enumerable.Empty<string>();
 
         public string Dns { get; set; }
 

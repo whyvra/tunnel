@@ -85,7 +85,7 @@ namespace Whyvra.Tunnel.Api.Configuration
                                         Id = "Bearer"
                                     }
                                 },
-                                new string[] { }
+                                Array.Empty<string>()
                             }
                         });
                     }

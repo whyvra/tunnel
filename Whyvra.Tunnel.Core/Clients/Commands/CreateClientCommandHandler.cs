@@ -48,13 +48,13 @@ namespace Whyvra.Tunnel.Core.Clients.Commands
                 var addresses = await _context.Clients
                     .AsNoTracking()
                     .Where(x => x.ServerId == command.ServerId)
-                    .Select(x => x.AssignedIp.addr)
+                    .Select(x => x.AssignedIp)
                     .ToListAsync();
 
                 // Remove the ones that are in use
                 foreach (var addr in addresses)
                 {
-                    available.Remove(addr);
+                    available.Remove(addr.addr);
                 }
 
                 // Grab the first remaining one

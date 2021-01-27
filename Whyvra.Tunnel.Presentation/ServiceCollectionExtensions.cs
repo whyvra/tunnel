@@ -2,7 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text.Json;
-using Bunit;
+using Blazorme;
 using FluentValidation;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Components.WebAssembly.Hosting;
@@ -90,7 +90,7 @@ namespace Whyvra.Tunnel.Presentation
             // Register service dependencies
             builder.Services
                 .AddScoped<QRCodeGenerator>()
-                .AddScoped<TestContext>();
+                .AddScoped<TestHost>();
 
             // Register services
             builder.Services

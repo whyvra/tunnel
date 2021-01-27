@@ -28,14 +28,23 @@ jobs:
           echo "ModuleVersion=$(gitv)" >> $GITHUB_ENV
           echo "MajorMinVersion=$(gitv | cut -f1,2 -d '.')" >> $GITHUB_ENV
 
+      - name: Copy Blazor settings
+        run: cp ./docker/blazor.appsettings.json ./Whyvra.Tunnel.Presentation/wwwroot/appsettings.json
+
       - name: Build code
         run: |
-          dotnet restore -r linux-musl-x64
-          dotnet publish Whyvra.Tunnel.Api -c Release -o Build/api -f netcoreapp3.1 --self-contained false -r linux-musl-x64 --no-restore -p:Version=$AssemblyVersion
+          dotnet restore
+          dotnet publish Whyvra.Tunnel.Api -c Release -o Build/api -f net5.0 --self-contained false --no-restore -p:Version=$AssemblyVersion
           dotnet publish Whyvra.Tunnel.Presentation -c Release -o Build --no-restore -p:Version=$AssemblyVersion
 
-      - name: Build Docker image
-        run: docker build --tag whyvra/tunnel:latest --tag whyvra/tunnel:$ModuleVersion --tag whyvra/tunnel:$MajorMinVersion .
+      - name: Cleanup compressed Blazor appsettings
+        run: rm ./Build/wwwroot/appsettings.json.*
+
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v1
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v1
 
       - name: DockerHub Login
         uses: docker/login-action@v1
@@ -43,8 +52,15 @@ jobs:
           username: ${{ secrets.DOCKER_USERNAME }}
           password: ${{ secrets.DOCKER_PASSWORD }}
 
-      - name: Push to Docker Hub
-        run: |
-          docker push whyvra/tunnel:latest
-          docker push whyvra/tunnel:$ModuleVersion
-          docker push whyvra/tunnel:$MajorMinVersion
+      - name: Build and push
+        id: docker_build
+        uses: docker/build-push-action@v2
+        with:
+          context: .
+          file: ./Dockerfile
+          platforms: linux/amd64,linux/arm64,linux/arm/v7
+          push: true
+          tags: |
+            whyvra/tunnel:latest
+            whyvra/tunnel:${{ env.ModuleVersion }}
+            whyvra/tunnel:${{ env.MajorMinVersion }}

@@ -19,8 +19,6 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Whyvra.Tunnel.Api", "Whyvra
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Whyvra.Tunnel.Presentation", "Whyvra.Tunnel.Presentation\Whyvra.Tunnel.Presentation.csproj", "{AD0B63E0-C57E-4AE9-9AC6-AB8447C7872D}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Whyvra.Blazor.Forms", "Whyvra.Blazor.Forms\Whyvra.Blazor.Forms.csproj", "{41BD7BE3-D771-470D-979D-BDF5BC756E00}"
-EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU

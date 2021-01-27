@@ -3,7 +3,7 @@
 
 <div class="select">
     <select @onchange="GoToServer">
-        <option disabled>Pick a server</option>
+        <option disabled selected>Pick a server</option>
         @foreach(var server in servers)
         {
         <option value="@server.Id">@server.Name</option>

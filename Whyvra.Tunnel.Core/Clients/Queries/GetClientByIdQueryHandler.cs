@@ -28,9 +28,9 @@ namespace Whyvra.Tunnel.Core.Clients.Queries
                     Name = x.Name,
                     Description = x.Description,
                     AllowedIps = x.AllowedIps
-                        .Select(n => $"{n.NetworkAddress.Address.addr}/{n.NetworkAddress.Address.cidr}")
+                        .Select(n => TunnelFunctions.Text(n.NetworkAddress.Address))
                         .ToList(),
-                    AssignedIp = $"{x.AssignedIp.addr}/{x.AssignedIp.cidr}",
+                    AssignedIp = TunnelFunctions.Text(x.AssignedIp),
                     IsRevoked = x.IsRevoked,
                     PublicKey = x.PublicKey,
                     CreatedAt = x.CreatedAt,

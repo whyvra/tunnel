@@ -12,7 +12,7 @@
     overflow: hidden;
 }
 
-.jumbotron div.actions-panel {
+.jumbotron div.columns {
     padding-top: 2rem;
 }
 
@@ -24,6 +24,12 @@
     padding-bottom: 1rem;
 }
 
-.info-tile h2 > .icon {
-    padding-right: 10px;
+.info-tile h2 .icon {
+    margin-right: 10px;
+}
+
+@media screen and (max-width:768px) {
+    .buttons-bar .column {
+        padding: .25rem;
+    }
 }

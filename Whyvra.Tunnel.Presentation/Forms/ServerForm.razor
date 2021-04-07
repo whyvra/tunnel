@@ -115,14 +115,14 @@ else if (_formModel != null)
         var fb = new FormBuilder<ServerViewModel>();
 
         fb
-            .Input(x => x.Server.Name).WithIcon("server")
+            .Input(x => x.Server.Name).WithIcon("fas fa-server")
             .TextArea(x => x.Server.Description, rows: 3)
-            .Input(x => x.Server.AssignedRange).WithText("Assigned IP Range").WithIcon("network-wired").WithPlaceholder("e.g. 10.200.10.0/24")
+            .Input(x => x.Server.AssignedRange).WithText("Assigned IP Range").WithIcon("fas fa-network-wired").WithPlaceholder("e.g. 10.200.10.0/24")
             .TagsInput(x => x.DefaultAllowedRange).WithEmptyValue("No IP range has been assigned").WithPlaceholder("Comma-seperated list of address ranges e.g. 0.0.0.0/0, ::/0,")
-            .Input(x => x.Server.Dns).WithText("DNS").WithIcon("address-book")
-            .Input(x => x.Server.Endpoint).WithIcon("globe").WithPlaceholder("<IP Address | domain>:<port number> e.g. domain.xyz:53")
-            .Number(x => x.Server.ListenPort).WithText("Port to listen").WithIcon("ethernet")
-            .Input(x => x.Server.PublicKey).WithIcon("key");
+            .Input(x => x.Server.Dns).WithText("DNS").WithIcon("fas fa-address-book")
+            .Input(x => x.Server.Endpoint).WithIcon("fas fa-globe").WithPlaceholder("<IP Address | domain>:<port number> e.g. domain.xyz:53")
+            .Number(x => x.Server.ListenPort).WithText("Port to listen").WithIcon("fas fa-ethernet")
+            .Input(x => x.Server.PublicKey).WithIcon("fas fa-key");
 
         if (ServerId.HasValue)
         {

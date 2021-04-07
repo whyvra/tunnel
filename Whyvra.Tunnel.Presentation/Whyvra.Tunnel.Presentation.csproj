@@ -12,7 +12,7 @@
     <PackageReference Include="Microsoft.Extensions.Http" Version="5.0.0" />
     <PackageReference Include="QRCoder" Version="1.4.1" />
     <PackageReference Include="System.Net.Http.Json" Version="5.0.0" />
-    <PackageReference Include="Whyvra.Blazor.Forms" Version="0.1.0" />
+    <PackageReference Include="Whyvra.Blazor.Forms" Version="0.2.0" />
     <PackageReference Include="Whyvra.Crypto.X25519" Version="0.1.0" />
   </ItemGroup>
 

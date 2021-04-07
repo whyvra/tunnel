@@ -168,11 +168,11 @@ else if (_formModel != null)
         _copy = JsonSerializer.Serialize(client);
 
         _formModel = new FormBuilder<UpdateClientViewModel>()
-            .Input(x => x.Client.Name).WithIcon("user")
+            .Input(x => x.Client.Name).WithIcon("fas fa-user")
             .TextArea(x => x.Client.Description)
-            .Input(x => x.Client.AssignedIp).WithIcon("network-wired").WithText("Assigned IP")
+            .Input(x => x.Client.AssignedIp).WithIcon("fas fa-network-wired").WithText("Assigned IP")
             .TagsInput(x => x.AllowedIps).WithText("Allowed IPs").WithEmptyValue("No IPs allowed")
-            .Input(x => x.Client.PublicKey).WithIcon("key")
+            .Input(x => x.Client.PublicKey).WithIcon("fas fa-key")
             .WithModel(viewModel)
             .Build();
     }

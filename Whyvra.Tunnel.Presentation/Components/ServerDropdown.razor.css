@@ -1,0 +1,13 @@
+.dropdown.is-fullwidth {
+    width: 100%;
+}
+
+.dropdown.is-fullwidth .dropdown-trigger {
+    width: 100%
+}
+
+.dropdown.is-fullwidth .button {
+    display: flex;
+    width: 100%;
+    justify-content: center
+}

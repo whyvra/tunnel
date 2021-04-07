@@ -18,16 +18,20 @@
         </div>
     </div>
     
-    <div class="actions-panel">
+    <div class="buttons-bar columns is-variable is-1">
         <AuthView>
             <ChildContent>
-                <ServerDropdown></ServerDropdown>
-                <NavLink class="button is-primary" href="/servers">
-                    <span class="icon">
-                        <i class="fas fa-server"></i>
-                    </span>
-                    <span>Manage servers</span>
-                </NavLink>
+                <div class="column is-2">
+                    <NavLink class="button is-fullwidth is-primary" href="/servers">
+                        <span class="icon">
+                            <i class="fas fa-server"></i>
+                        </span>
+                        <span>Manage servers</span>
+                    </NavLink>
+                </div>
+                <div class="column is-2">
+                    <ServerDropdown></ServerDropdown>
+                </div>
             </ChildContent>
             <NotAuthorizedContent>
                 @if (_userNotInRole)
@@ -61,11 +65,13 @@
     @foreach (var tile in tiles)
     {
     <div class="column is-one-third info-tile">
-        <h2 class="is-size-4 has-text-centered">
-            <span class="icon">
-                <i class="fas fa-@(tile.Icon)"></i>
-            </span>
-            <span>@tile.Title</span>
+        <h2 class="is-size-4">
+            <div class="icon-text">
+                <span class="icon">
+                    <i class="fas fa-@(tile.Icon)"></i>
+                </span>
+                <span>@tile.Title</span>
+            </div>
         </h2>
         <p class="is-size-5">@((MarkupString) tile.Text)</p>
     </div>

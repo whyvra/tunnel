@@ -1,4 +1,4 @@
-FROM whyvra/dotnet-nginx-brotli:latest
+FROM whyvra/dotnet-nginx-brotli:5.0
 
 # add nginx config for webapp
 ADD ./docker/tunnel.conf /etc/nginx/conf.d

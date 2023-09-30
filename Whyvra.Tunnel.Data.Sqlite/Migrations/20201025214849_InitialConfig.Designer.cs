@@ -18,7 +18,7 @@ namespace Whyvra.Tunnel.Data.Sqlite.Migrations
             modelBuilder
                 .HasAnnotation("ProductVersion", "3.1.9");
 
-            modelBuilder.Entity("Whyvra.Tunnel.Domain.Entitites.ClientNetworkAddress", b =>
+            modelBuilder.Entity("Whyvra.Tunnel.Domain.Entities.ClientNetworkAddress", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -46,7 +46,7 @@ namespace Whyvra.Tunnel.Data.Sqlite.Migrations
                     b.ToTable("ClientNetworkAddresses");
                 });
 
-            modelBuilder.Entity("Whyvra.Tunnel.Domain.Entitites.Event", b =>
+            modelBuilder.Entity("Whyvra.Tunnel.Domain.Entities.Event", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -86,7 +86,7 @@ namespace Whyvra.Tunnel.Data.Sqlite.Migrations
                     b.ToTable("Events");
                 });
 
-            modelBuilder.Entity("Whyvra.Tunnel.Domain.Entitites.NetworkAddress", b =>
+            modelBuilder.Entity("Whyvra.Tunnel.Domain.Entities.NetworkAddress", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -126,7 +126,7 @@ namespace Whyvra.Tunnel.Data.Sqlite.Migrations
                         });
                 });
 
-            modelBuilder.Entity("Whyvra.Tunnel.Domain.Entitites.ServerNetworkAddress", b =>
+            modelBuilder.Entity("Whyvra.Tunnel.Domain.Entities.ServerNetworkAddress", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -154,7 +154,7 @@ namespace Whyvra.Tunnel.Data.Sqlite.Migrations
                     b.ToTable("ServerNetworkAddresses");
                 });
 
-            modelBuilder.Entity("Whyvra.Tunnel.Domain.Entitites.User", b =>
+            modelBuilder.Entity("Whyvra.Tunnel.Domain.Entities.User", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -216,7 +216,7 @@ namespace Whyvra.Tunnel.Data.Sqlite.Migrations
                         });
                 });
 
-            modelBuilder.Entity("Whyvra.Tunnel.Domain.Entitites.WireguardClient", b =>
+            modelBuilder.Entity("Whyvra.Tunnel.Domain.Entities.WireguardClient", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -265,7 +265,7 @@ namespace Whyvra.Tunnel.Data.Sqlite.Migrations
                     b.ToTable("Clients");
                 });
 
-            modelBuilder.Entity("Whyvra.Tunnel.Domain.Entitites.WireguardServer", b =>
+            modelBuilder.Entity("Whyvra.Tunnel.Domain.Entities.WireguardServer", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -314,48 +314,48 @@ namespace Whyvra.Tunnel.Data.Sqlite.Migrations
                     b.ToTable("Servers");
                 });
 
-            modelBuilder.Entity("Whyvra.Tunnel.Domain.Entitites.ClientNetworkAddress", b =>
+            modelBuilder.Entity("Whyvra.Tunnel.Domain.Entities.ClientNetworkAddress", b =>
                 {
-                    b.HasOne("Whyvra.Tunnel.Domain.Entitites.WireguardClient", "Client")
+                    b.HasOne("Whyvra.Tunnel.Domain.Entities.WireguardClient", "Client")
                         .WithMany("AllowedIps")
                         .HasForeignKey("ClientId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("Whyvra.Tunnel.Domain.Entitites.NetworkAddress", "NetworkAddress")
+                    b.HasOne("Whyvra.Tunnel.Domain.Entities.NetworkAddress", "NetworkAddress")
                         .WithMany()
                         .HasForeignKey("NetworkAddressId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
                 });
 
-            modelBuilder.Entity("Whyvra.Tunnel.Domain.Entitites.Event", b =>
+            modelBuilder.Entity("Whyvra.Tunnel.Domain.Entities.Event", b =>
                 {
-                    b.HasOne("Whyvra.Tunnel.Domain.Entitites.User", "User")
+                    b.HasOne("Whyvra.Tunnel.Domain.Entities.User", "User")
                         .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
                 });
 
-            modelBuilder.Entity("Whyvra.Tunnel.Domain.Entitites.ServerNetworkAddress", b =>
+            modelBuilder.Entity("Whyvra.Tunnel.Domain.Entities.ServerNetworkAddress", b =>
                 {
-                    b.HasOne("Whyvra.Tunnel.Domain.Entitites.NetworkAddress", "NetworkAddress")
+                    b.HasOne("Whyvra.Tunnel.Domain.Entities.NetworkAddress", "NetworkAddress")
                         .WithMany()
                         .HasForeignKey("NetworkAddressId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("Whyvra.Tunnel.Domain.Entitites.WireguardServer", "Server")
+                    b.HasOne("Whyvra.Tunnel.Domain.Entities.WireguardServer", "Server")
                         .WithMany("DefaultAllowedRange")
                         .HasForeignKey("ServerId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
                 });
 
-            modelBuilder.Entity("Whyvra.Tunnel.Domain.Entitites.WireguardClient", b =>
+            modelBuilder.Entity("Whyvra.Tunnel.Domain.Entities.WireguardClient", b =>
                 {
-                    b.HasOne("Whyvra.Tunnel.Domain.Entitites.WireguardServer", "Server")
+                    b.HasOne("Whyvra.Tunnel.Domain.Entities.WireguardServer", "Server")
                         .WithMany("Clients")
                         .HasForeignKey("ServerId")
                         .OnDelete(DeleteBehavior.Cascade)

@@ -1,7 +1,7 @@
 using System;
 using System.Text.Json;
 
-namespace Whyvra.Tunnel.Domain.Entitites
+namespace Whyvra.Tunnel.Domain.Entities
 {
     public class Event
     {

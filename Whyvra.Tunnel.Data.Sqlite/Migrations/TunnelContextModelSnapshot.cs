@@ -5,6 +5,8 @@ using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Whyvra.Tunnel.Data;
 
+#nullable disable
+
 namespace Whyvra.Tunnel.Data.Sqlite.Migrations
 {
     [DbContext(typeof(TunnelContext))]
@@ -13,10 +15,58 @@ namespace Whyvra.Tunnel.Data.Sqlite.Migrations
         protected override void BuildModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
-            modelBuilder
-                .HasAnnotation("ProductVersion", "3.1.9");
+            modelBuilder.HasAnnotation("ProductVersion", "6.0.5");
 
-            modelBuilder.Entity("Whyvra.Tunnel.Domain.Entitites.ClientNetworkAddress", b =>
+            modelBuilder.Entity("Whyvra.Tunnel.Domain.Entities.Client", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("INTEGER");
+
+                    b.Property<string>("AssignedIp")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("Description")
+                        .HasMaxLength(128)
+                        .HasColumnType("TEXT");
+
+                    b.Property<bool>("IsRevoked")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(64)
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("PublicKey")
+                        .IsRequired()
+                        .HasMaxLength(44)
+                        .HasColumnType("TEXT");
+
+                    b.Property<int>("ServerId")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<DateTime>("UpdatedAt")
+                        .HasColumnType("TEXT");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ServerId");
+
+                    b.HasIndex("AssignedIp", "ServerId")
+                        .IsUnique();
+
+                    b.HasIndex("Name", "ServerId")
+                        .IsUnique();
+
+                    b.ToTable("Clients");
+                });
+
+            modelBuilder.Entity("Whyvra.Tunnel.Domain.Entities.ClientNetworkAddress", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -44,7 +94,7 @@ namespace Whyvra.Tunnel.Data.Sqlite.Migrations
                     b.ToTable("ClientNetworkAddresses");
                 });
 
-            modelBuilder.Entity("Whyvra.Tunnel.Domain.Entitites.Event", b =>
+            modelBuilder.Entity("Whyvra.Tunnel.Domain.Entities.Event", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -55,21 +105,21 @@ namespace Whyvra.Tunnel.Data.Sqlite.Migrations
 
                     b.Property<string>("EventType")
                         .IsRequired()
-                        .HasColumnType("TEXT")
-                        .HasMaxLength(16);
+                        .HasMaxLength(16)
+                        .HasColumnType("TEXT");
 
                     b.Property<int>("RecordId")
                         .HasColumnType("INTEGER");
 
                     b.Property<string>("SourceAddress")
                         .IsRequired()
-                        .HasColumnType("TEXT")
-                        .HasMaxLength(45);
+                        .HasMaxLength(45)
+                        .HasColumnType("TEXT");
 
                     b.Property<string>("TableId")
                         .IsRequired()
-                        .HasColumnType("TEXT")
-                        .HasMaxLength(32);
+                        .HasMaxLength(32)
+                        .HasColumnType("TEXT");
 
                     b.Property<DateTime>("Timestamp")
                         .HasColumnType("TEXT");
@@ -84,7 +134,7 @@ namespace Whyvra.Tunnel.Data.Sqlite.Migrations
                     b.ToTable("Events");
                 });
 
-            modelBuilder.Entity("Whyvra.Tunnel.Domain.Entitites.NetworkAddress", b =>
+            modelBuilder.Entity("Whyvra.Tunnel.Domain.Entities.NetworkAddress", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -124,7 +174,104 @@ namespace Whyvra.Tunnel.Data.Sqlite.Migrations
                         });
                 });
 
-            modelBuilder.Entity("Whyvra.Tunnel.Domain.Entitites.ServerNetworkAddress", b =>
+            modelBuilder.Entity("Whyvra.Tunnel.Domain.Entities.Server", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("INTEGER")
+                        .HasColumnOrder(1);
+
+                    b.Property<bool?>("AddFirewallRules")
+                        .IsRequired()
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("INTEGER")
+                        .HasDefaultValue(true)
+                        .HasColumnOrder(11);
+
+                    b.Property<string>("AssignedRange")
+                        .IsRequired()
+                        .HasColumnType("TEXT")
+                        .HasColumnOrder(4);
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("TEXT")
+                        .HasColumnOrder(15);
+
+                    b.Property<string>("CustomConfiguration")
+                        .HasColumnType("TEXT")
+                        .HasColumnOrder(13);
+
+                    b.Property<string>("Description")
+                        .HasMaxLength(128)
+                        .HasColumnType("TEXT")
+                        .HasColumnOrder(3);
+
+                    b.Property<string>("Dns")
+                        .IsRequired()
+                        .HasColumnType("TEXT")
+                        .HasColumnOrder(5);
+
+                    b.Property<string>("Endpoint")
+                        .IsRequired()
+                        .HasColumnType("TEXT")
+                        .HasColumnOrder(6);
+
+                    b.Property<int>("ListenPort")
+                        .HasColumnType("INTEGER")
+                        .HasColumnOrder(7);
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(64)
+                        .HasColumnType("TEXT")
+                        .HasColumnOrder(2);
+
+                    b.Property<string>("NetworkInterface")
+                        .IsRequired()
+                        .ValueGeneratedOnAdd()
+                        .HasMaxLength(16)
+                        .HasColumnType("TEXT")
+                        .HasDefaultValue("eth0")
+                        .HasColumnOrder(12);
+
+                    b.Property<string>("PublicKey")
+                        .IsRequired()
+                        .HasMaxLength(44)
+                        .HasColumnType("TEXT")
+                        .HasColumnOrder(8);
+
+                    b.Property<bool>("RenderToDisk")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("INTEGER")
+                        .HasDefaultValue(false)
+                        .HasColumnOrder(10);
+
+                    b.Property<string>("StatusApi")
+                        .HasMaxLength(128)
+                        .HasColumnType("TEXT")
+                        .HasColumnOrder(9);
+
+                    b.Property<DateTime>("UpdatedAt")
+                        .HasColumnType("TEXT")
+                        .HasColumnOrder(16);
+
+                    b.Property<string>("WireGuardInterface")
+                        .HasMaxLength(16)
+                        .HasColumnType("TEXT")
+                        .HasColumnOrder(14);
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("Name")
+                        .IsUnique();
+
+                    b.HasIndex("WireGuardInterface")
+                        .IsUnique();
+
+                    b.ToTable("Servers");
+                });
+
+            modelBuilder.Entity("Whyvra.Tunnel.Domain.Entities.ServerNetworkAddress", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -152,7 +299,7 @@ namespace Whyvra.Tunnel.Data.Sqlite.Migrations
                     b.ToTable("ServerNetworkAddresses");
                 });
 
-            modelBuilder.Entity("Whyvra.Tunnel.Domain.Entitites.User", b =>
+            modelBuilder.Entity("Whyvra.Tunnel.Domain.Entities.User", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -163,18 +310,18 @@ namespace Whyvra.Tunnel.Data.Sqlite.Migrations
 
                     b.Property<string>("Email")
                         .IsRequired()
-                        .HasColumnType("TEXT")
-                        .HasMaxLength(128);
+                        .HasMaxLength(128)
+                        .HasColumnType("TEXT");
 
                     b.Property<string>("FirstName")
                         .IsRequired()
-                        .HasColumnType("TEXT")
-                        .HasMaxLength(64);
+                        .HasMaxLength(64)
+                        .HasColumnType("TEXT");
 
                     b.Property<string>("LastName")
                         .IsRequired()
-                        .HasColumnType("TEXT")
-                        .HasMaxLength(64);
+                        .HasMaxLength(64)
+                        .HasColumnType("TEXT");
 
                     b.Property<Guid>("Uid")
                         .HasColumnType("TEXT");
@@ -184,8 +331,8 @@ namespace Whyvra.Tunnel.Data.Sqlite.Migrations
 
                     b.Property<string>("Username")
                         .IsRequired()
-                        .HasColumnType("TEXT")
-                        .HasMaxLength(128);
+                        .HasMaxLength(128)
+                        .HasColumnType("TEXT");
 
                     b.HasKey("Id");
 
@@ -214,150 +361,76 @@ namespace Whyvra.Tunnel.Data.Sqlite.Migrations
                         });
                 });
 
-            modelBuilder.Entity("Whyvra.Tunnel.Domain.Entitites.WireguardClient", b =>
+            modelBuilder.Entity("Whyvra.Tunnel.Domain.Entities.Client", b =>
                 {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("INTEGER");
+                    b.HasOne("Whyvra.Tunnel.Domain.Entities.Server", "Server")
+                        .WithMany("Clients")
+                        .HasForeignKey("ServerId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
-                    b.Property<string>("AssignedIp")
-                        .IsRequired()
-                        .HasColumnType("TEXT");
-
-                    b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("TEXT");
-
-                    b.Property<string>("Description")
-                        .HasColumnType("TEXT")
-                        .HasMaxLength(128);
-
-                    b.Property<bool>("IsRevoked")
-                        .HasColumnType("INTEGER");
-
-                    b.Property<string>("Name")
-                        .IsRequired()
-                        .HasColumnType("TEXT")
-                        .HasMaxLength(64);
-
-                    b.Property<string>("PublicKey")
-                        .IsRequired()
-                        .HasColumnType("TEXT")
-                        .HasMaxLength(44);
-
-                    b.Property<int>("ServerId")
-                        .HasColumnType("INTEGER");
-
-                    b.Property<DateTime>("UpdatedAt")
-                        .HasColumnType("TEXT");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("ServerId");
-
-                    b.HasIndex("AssignedIp", "ServerId")
-                        .IsUnique();
-
-                    b.HasIndex("Name", "ServerId")
-                        .IsUnique();
-
-                    b.ToTable("Clients");
+                    b.Navigation("Server");
                 });
 
-            modelBuilder.Entity("Whyvra.Tunnel.Domain.Entitites.WireguardServer", b =>
+            modelBuilder.Entity("Whyvra.Tunnel.Domain.Entities.ClientNetworkAddress", b =>
                 {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("INTEGER");
-
-                    b.Property<string>("AssignedRange")
-                        .IsRequired()
-                        .HasColumnType("TEXT");
-
-                    b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("TEXT");
-
-                    b.Property<string>("Description")
-                        .HasColumnType("TEXT")
-                        .HasMaxLength(128);
-
-                    b.Property<string>("Dns")
-                        .IsRequired()
-                        .HasColumnType("TEXT");
-
-                    b.Property<string>("Endpoint")
-                        .IsRequired()
-                        .HasColumnType("TEXT");
-
-                    b.Property<int>("ListenPort")
-                        .HasColumnType("INTEGER");
-
-                    b.Property<string>("Name")
-                        .IsRequired()
-                        .HasColumnType("TEXT")
-                        .HasMaxLength(64);
-
-                    b.Property<string>("PublicKey")
-                        .IsRequired()
-                        .HasColumnType("TEXT")
-                        .HasMaxLength(44);
-
-                    b.Property<DateTime>("UpdatedAt")
-                        .HasColumnType("TEXT");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("Name")
-                        .IsUnique();
-
-                    b.ToTable("Servers");
-                });
-
-            modelBuilder.Entity("Whyvra.Tunnel.Domain.Entitites.ClientNetworkAddress", b =>
-                {
-                    b.HasOne("Whyvra.Tunnel.Domain.Entitites.WireguardClient", "Client")
+                    b.HasOne("Whyvra.Tunnel.Domain.Entities.Client", "Client")
                         .WithMany("AllowedIps")
                         .HasForeignKey("ClientId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("Whyvra.Tunnel.Domain.Entitites.NetworkAddress", "NetworkAddress")
+                    b.HasOne("Whyvra.Tunnel.Domain.Entities.NetworkAddress", "NetworkAddress")
                         .WithMany()
                         .HasForeignKey("NetworkAddressId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+
+                    b.Navigation("Client");
+
+                    b.Navigation("NetworkAddress");
                 });
 
-            modelBuilder.Entity("Whyvra.Tunnel.Domain.Entitites.Event", b =>
+            modelBuilder.Entity("Whyvra.Tunnel.Domain.Entities.Event", b =>
                 {
-                    b.HasOne("Whyvra.Tunnel.Domain.Entitites.User", "User")
+                    b.HasOne("Whyvra.Tunnel.Domain.Entities.User", "User")
                         .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+
+                    b.Navigation("User");
                 });
 
-            modelBuilder.Entity("Whyvra.Tunnel.Domain.Entitites.ServerNetworkAddress", b =>
+            modelBuilder.Entity("Whyvra.Tunnel.Domain.Entities.ServerNetworkAddress", b =>
                 {
-                    b.HasOne("Whyvra.Tunnel.Domain.Entitites.NetworkAddress", "NetworkAddress")
+                    b.HasOne("Whyvra.Tunnel.Domain.Entities.NetworkAddress", "NetworkAddress")
                         .WithMany()
                         .HasForeignKey("NetworkAddressId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("Whyvra.Tunnel.Domain.Entitites.WireguardServer", "Server")
+                    b.HasOne("Whyvra.Tunnel.Domain.Entities.Server", "Server")
                         .WithMany("DefaultAllowedRange")
                         .HasForeignKey("ServerId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+
+                    b.Navigation("NetworkAddress");
+
+                    b.Navigation("Server");
                 });
 
-            modelBuilder.Entity("Whyvra.Tunnel.Domain.Entitites.WireguardClient", b =>
+            modelBuilder.Entity("Whyvra.Tunnel.Domain.Entities.Client", b =>
                 {
-                    b.HasOne("Whyvra.Tunnel.Domain.Entitites.WireguardServer", "Server")
-                        .WithMany("Clients")
-                        .HasForeignKey("ServerId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                    b.Navigation("AllowedIps");
+                });
+
+            modelBuilder.Entity("Whyvra.Tunnel.Domain.Entities.Server", b =>
+                {
+                    b.Navigation("Clients");
+
+                    b.Navigation("DefaultAllowedRange");
                 });
 #pragma warning restore 612, 618
         }

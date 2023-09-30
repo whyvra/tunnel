@@ -1,7 +1,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
-using Whyvra.Tunnel.Domain.Entitites;
+using Whyvra.Tunnel.Domain.Entities;
 
 namespace Whyvra.Tunnel.Data.Configuration
 {

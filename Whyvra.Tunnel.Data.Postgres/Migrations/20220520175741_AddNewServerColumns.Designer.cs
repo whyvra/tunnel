@@ -4,6 +4,7 @@ using System.Net;
 using System.Text.Json;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using Whyvra.Tunnel.Data;
@@ -13,9 +14,10 @@ using Whyvra.Tunnel.Data;
 namespace Whyvra.Tunnel.Data.Postgres.Migrations
 {
     [DbContext(typeof(TunnelContext))]
-    partial class TunnelContextModelSnapshot : ModelSnapshot
+    [Migration("20220520175741_AddNewServerColumns")]
+    partial class AddNewServerColumns
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder

@@ -170,14 +170,14 @@ namespace Whyvra.Tunnel.Data.Postgres.Migrations
                 columns: new[] { "Id", "Address", "CreatedAt", "UpdatedAt" },
                 values: new object[,]
                 {
-                    { 1, new System.ValueTuple<System.Net.IPAddress, int>(System.Net.IPAddress.Parse("0.0.0.0"), 0), new DateTime(2020, 10, 25, 21, 47, 35, 59, DateTimeKind.Utc).AddTicks(7650), new DateTime(2020, 10, 25, 21, 47, 35, 59, DateTimeKind.Utc).AddTicks(7650) },
-                    { 2, new System.ValueTuple<System.Net.IPAddress, int>(System.Net.IPAddress.Parse("::"), 0), new DateTime(2020, 10, 25, 21, 47, 35, 59, DateTimeKind.Utc).AddTicks(7650), new DateTime(2020, 10, 25, 21, 47, 35, 59, DateTimeKind.Utc).AddTicks(7650) }
+                    { 1, new System.ValueTuple<System.Net.IPAddress, int>(System.Net.IPAddress.Parse("0.0.0.0"), 0), new DateTime(2020, 10, 25, 21, 47, 35, 59, DateTimeKind.Unspecified).AddTicks(7650), new DateTime(2020, 10, 25, 21, 47, 35, 59, DateTimeKind.Unspecified).AddTicks(7650) },
+                    { 2, new System.ValueTuple<System.Net.IPAddress, int>(System.Net.IPAddress.Parse("::"), 0), new DateTime(2020, 10, 25, 21, 47, 35, 59, DateTimeKind.Unspecified).AddTicks(7650), new DateTime(2020, 10, 25, 21, 47, 35, 59, DateTimeKind.Unspecified).AddTicks(7650) }
                 });
 
             migrationBuilder.InsertData(
                 table: "Users",
                 columns: new[] { "Id", "CreatedAt", "Email", "FirstName", "LastName", "Uid", "UpdatedAt", "Username" },
-                values: new object[] { 1, new DateTime(2020, 10, 25, 21, 47, 35, 65, DateTimeKind.Utc).AddTicks(993), "system@example.com", "System", "User", new Guid("e3adf55b-7430-42c1-ae62-758d7b644fdb"), new DateTime(2020, 10, 25, 21, 47, 35, 65, DateTimeKind.Utc).AddTicks(993), "system_user" });
+                values: new object[] { 1, new DateTime(2020, 10, 25, 21, 47, 35, 65, DateTimeKind.Unspecified).AddTicks(993), "system@example.com", "System", "User", new Guid("e3adf55b-7430-42c1-ae62-758d7b644fdb"), new DateTime(2020, 10, 25, 21, 47, 35, 65, DateTimeKind.Unspecified).AddTicks(993), "system_user" });
 
             migrationBuilder.CreateIndex(
                 name: "IX_ClientNetworkAddresses_ClientId",

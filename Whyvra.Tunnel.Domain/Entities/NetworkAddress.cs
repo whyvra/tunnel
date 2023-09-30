@@ -1,7 +1,7 @@
 using System;
 using System.Net;
 
-namespace Whyvra.Tunnel.Domain.Entitites
+namespace Whyvra.Tunnel.Domain.Entities
 {
     public class NetworkAddress : IEntity
     {

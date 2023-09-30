@@ -3,7 +3,7 @@ using System.Net;
 using System.Text;
 using System.Text.Json;
 using Microsoft.EntityFrameworkCore;
-using Whyvra.Tunnel.Domain.Entitites;
+using Whyvra.Tunnel.Domain.Entities;
 
 namespace Whyvra.Tunnel.Data.Configuration
 {

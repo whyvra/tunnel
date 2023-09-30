@@ -10,7 +10,7 @@ using Microsoft.EntityFrameworkCore.Storage;
 using Whyvra.Tunnel.Data.Configuration;
 using Whyvra.Tunnel.Data.Tracking;
 using Whyvra.Tunnel.Domain;
-using Whyvra.Tunnel.Domain.Entitites;
+using Whyvra.Tunnel.Domain.Entities;
 
 namespace Whyvra.Tunnel.Data
 {
@@ -20,7 +20,7 @@ namespace Whyvra.Tunnel.Data
         {
         }
 
-        public TunnelContext(DbContextOptions opts, IEventTracker tracker) : base(opts, tracker)
+        public TunnelContext(DbContextOptions<TunnelContext> opts, IEventTracker tracker) : base(opts, tracker)
         {
         }
 

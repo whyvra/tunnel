@@ -4,7 +4,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using Whyvra.Tunnel.Domain;
-using Whyvra.Tunnel.Domain.Entitites;
+using Whyvra.Tunnel.Domain.Entities;
 
 namespace Whyvra.Tunnel.Data.Tracking
 {

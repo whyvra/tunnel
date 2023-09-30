@@ -2,7 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Net;
 
-namespace Whyvra.Tunnel.Domain.Entitites
+namespace Whyvra.Tunnel.Domain.Entities
 {
     public class Server : IEntity
     {
@@ -23,6 +23,18 @@ namespace Whyvra.Tunnel.Domain.Entitites
         public int ListenPort { get; set; }
 
         public string PublicKey { get; set; }
+
+        public string StatusApi { get; set; }
+
+        public bool RenderToDisk { get; set; }
+
+        public bool? AddFirewallRules { get; set; }
+
+        public string NetworkInterface { get; set; }
+
+        public string CustomConfiguration { get; set; }
+
+        public string WireGuardInterface { get; set; }
 
         public DateTime CreatedAt { get; set; }
 

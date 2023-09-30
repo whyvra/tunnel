@@ -1,6 +1,6 @@
 using System;
 
-namespace Whyvra.Tunnel.Domain.Entitites
+namespace Whyvra.Tunnel.Domain.Entities
 {
     public class ClientNetworkAddress : IEntity
     {

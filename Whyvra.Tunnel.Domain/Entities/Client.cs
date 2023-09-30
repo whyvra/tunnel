@@ -2,7 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Net;
 
-namespace Whyvra.Tunnel.Domain.Entitites
+namespace Whyvra.Tunnel.Domain.Entities
 {
     public class Client : IEntity
     {

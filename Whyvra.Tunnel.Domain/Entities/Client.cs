@@ -4,7 +4,7 @@ using System.Net;
 
 namespace Whyvra.Tunnel.Domain.Entitites
 {
-    public class WireguardClient : IEntity
+    public class Client : IEntity
     {
         public int Id { get; set; }
 
@@ -20,7 +20,7 @@ namespace Whyvra.Tunnel.Domain.Entitites
 
         public int ServerId { get; set; }
 
-        public WireguardServer Server { get; set; }
+        public Server Server { get; set; }
 
         public DateTime CreatedAt { get; set; }
 

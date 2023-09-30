@@ -11,7 +11,7 @@ namespace Whyvra.Tunnel.Data
     {
         DatabaseFacade Database { get; }
 
-        DbSet<WireguardClient> Clients { get; set; }
+        DbSet<Client> Clients { get; set; }
 
         DbSet<ClientNetworkAddress> ClientNetworkAddresses { get; set; }
 
@@ -19,7 +19,7 @@ namespace Whyvra.Tunnel.Data
 
         DbSet<Event> Events { get; set; }
 
-        DbSet<WireguardServer> Servers { get ;set; }
+        DbSet<Server> Servers { get ;set; }
 
         DbSet<ServerNetworkAddress> ServerNetworkAddresses { get; set; }
 

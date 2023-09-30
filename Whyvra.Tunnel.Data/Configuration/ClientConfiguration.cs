@@ -4,9 +4,9 @@ using Whyvra.Tunnel.Domain.Entitites;
 
 namespace Whyvra.Tunnel.Data.Configuration
 {
-    public class WireguardClientConfiguration : IEntityTypeConfiguration<WireguardClient>
+    public class ClientConfiguration : IEntityTypeConfiguration<Client>
     {
-        public void Configure(EntityTypeBuilder<WireguardClient> builder)
+        public void Configure(EntityTypeBuilder<Client> builder)
         {
             builder.Property(x => x.Name)
                 .HasMaxLength(64)

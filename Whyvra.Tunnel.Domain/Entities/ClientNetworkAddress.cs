@@ -8,7 +8,7 @@ namespace Whyvra.Tunnel.Domain.Entitites
 
         public int ClientId { get; set; }
 
-        public WireguardClient Client { get; set; }
+        public Client Client { get; set; }
 
         public int NetworkAddressId { get; set; }
 

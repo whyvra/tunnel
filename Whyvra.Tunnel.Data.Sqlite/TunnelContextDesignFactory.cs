@@ -4,7 +4,6 @@ using System.Reflection;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Design;
 using Microsoft.Extensions.Configuration;
-using Whyvra.Tunnel.Data.Providers;
 
 namespace Whyvra.Tunnel.Data.Sqlite
 {
@@ -18,9 +17,9 @@ namespace Whyvra.Tunnel.Data.Sqlite
                 .Build();
 
             var assemblyName = Assembly.GetExecutingAssembly().GetName().Name;
-            var provider = new ConfigConnectionStringProvider(configuration);
+            var connectionString = configuration.GetConnectionString(nameof(TunnelContext));
             var builder = new DbContextOptionsBuilder<TunnelContext>();
-            builder.UseSqlite(provider.ConnectionString, x => x.MigrationsAssembly(assemblyName));
+            builder.UseSqlite(connectionString, x => x.MigrationsAssembly(assemblyName));
 
             return new TunnelContext(builder.Options);
         }

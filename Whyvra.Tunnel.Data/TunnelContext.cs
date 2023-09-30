@@ -8,37 +8,43 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Query.SqlExpressions;
 using Microsoft.EntityFrameworkCore.Storage;
 using Whyvra.Tunnel.Data.Configuration;
+using Whyvra.Tunnel.Data.Tracking;
 using Whyvra.Tunnel.Domain;
 using Whyvra.Tunnel.Domain.Entitites;
 
 namespace Whyvra.Tunnel.Data
 {
-    public class TunnelContext : DbContext, ITunnelContext
+    public class TunnelContext : EventTrackingDbContext, ITunnelContext
     {
-        private readonly IEventTracker _tracker;
-
         public TunnelContext(DbContextOptions<TunnelContext> opts) : base(opts)
         {
         }
 
-        public TunnelContext(DbContextOptions<TunnelContext> opts, IEventTracker tracker) : base(opts)
+        public TunnelContext(DbContextOptions opts, IEventTracker tracker) : base(opts, tracker)
         {
-            _tracker = tracker;
         }
 
-        public virtual DbSet<WireguardClient> Clients { get; set; }
+        public virtual DbSet<Client> Clients { get; set; }
 
         public virtual DbSet<ClientNetworkAddress> ClientNetworkAddresses { get; set; }
 
-        public virtual DbSet<Event> Events { get; set; }
-
         public virtual DbSet<NetworkAddress> NetworkAddresses { get; set; }
 
-        public virtual DbSet<WireguardServer> Servers { get ;set; }
+        public virtual DbSet<Server> Servers { get ;set; }
 
         public virtual DbSet<ServerNetworkAddress> ServerNetworkAddresses { get; set; }
 
         public virtual DbSet<User> Users { get; set; }
+
+        protected override int? GetUserId(Guid uid)
+        {
+            return Users.SingleOrDefault(x => x.Uid.Equals(uid))?.Id;
+        }
+
+        protected override async Task<int?> GetUserIdAsync(Guid uid, CancellationToken cancellationToken)
+        {
+            return (await Users.SingleOrDefaultAsync(x => x.Uid.Equals(uid), cancellationToken))?.Id;
+        }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -53,7 +59,8 @@ namespace Whyvra.Tunnel.Data
                 modelBuilder.ApplyDataFixForSqlite();
                 modelBuilder.HasDbFunction(method, builder => builder.HasName("LOWER").HasParameter("cidr").HasStoreType("string"));
             }
-            else {
+            else
+            {
                 modelBuilder
                     .HasDbFunction(method)
                     .HasTranslation(args => new SqlFunctionExpression(
@@ -64,85 +71,6 @@ namespace Whyvra.Tunnel.Data
                         typeof(string),
                         new StringTypeMapping("string", DbType.String)
                     ));
-            }
-        }
-
-        public override int SaveChanges()
-        {
-            // Current user lookup function
-            int? GetUserId(Guid uid) => Users.SingleOrDefault(x => x.Uid.Equals(uid))?.Id;
-
-            // Generate events based on tracked changes
-            var entries = ChangeTracker.Entries<IEntity>();
-            var events = _tracker.GetEvents(entries, GetUserId)
-                .ToList();
-
-            // Add eligible events
-            _tracker.AddEvents(events, this);
-
-            UpdateDateFields();
-
-            // Save changes
-            var count = base.SaveChanges();
-
-            // Add remaining events and save again if needed
-            var shouldSave = _tracker.AddRemainingEvents(events, this);
-            if (shouldSave) base.SaveChanges();
-
-            return count;
-        }
-
-        public override async Task<int> SaveChangesAsync(CancellationToken cancellationToken = new CancellationToken())
-        {
-            // Current user lookup function
-            int? GetUserId(Guid uid) => Users.SingleOrDefault(x => x.Uid.Equals(uid))?.Id;
-
-            // Generate events based on tracked changes
-            var entries = ChangeTracker.Entries<IEntity>();
-            var events = _tracker.GetEvents(entries, GetUserId)
-                .ToList();
-
-            // Add eligible events
-            await _tracker.AddEventsAsync(events, this, cancellationToken);
-
-            UpdateDateFields();
-
-            // Save changes
-            var count = await base.SaveChangesAsync(cancellationToken);
-
-            // Add remaining events and save again if needed
-            var shouldSave = await _tracker.AddRemainingEventsAsync(events, this, cancellationToken);
-            if (shouldSave) await base.SaveChangesAsync(cancellationToken);
-
-            return count;
-        }
-
-        private void UpdateDateFields()
-        {
-            var entries = ChangeTracker.Entries();
-            var now = DateTime.UtcNow;
-
-            foreach (var entry in entries)
-            {
-                if (entry.Entity is IEntity entity)
-                {
-                    switch (entry.State)
-                    {
-                        case EntityState.Modified:
-                            entity.UpdatedAt = now;
-                            break;
-
-                        case EntityState.Added:
-                            entity.CreatedAt = now;
-                            entity.UpdatedAt = now;
-                            break;
-                    }
-                }
-
-                if (entry.Entity is Event ev)
-                {
-                    ev.Timestamp = now;
-                }
             }
         }
     }

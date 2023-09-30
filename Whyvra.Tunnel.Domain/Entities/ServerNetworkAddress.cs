@@ -12,7 +12,7 @@ namespace Whyvra.Tunnel.Domain.Entitites
 
         public int ServerId { get; set; }
 
-        public WireguardServer Server { get; set; }
+        public Server Server { get; set; }
 
         public DateTime CreatedAt { get; set; }
 

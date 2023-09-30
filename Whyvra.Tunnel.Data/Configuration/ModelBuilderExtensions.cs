@@ -23,19 +23,19 @@ namespace Whyvra.Tunnel.Data.Configuration
                     x => x.ToAddress()
                 );
 
-            modelBuilder.Entity<WireguardClient>().Property(x => x.AssignedIp)
+            modelBuilder.Entity<Client>().Property(x => x.AssignedIp)
                 .HasConversion(
                     x => $"{x.addr}/{x.cidr}",
                     x => x.ToAddress()
                 );
 
-            modelBuilder.Entity<WireguardServer>().Property(x => x.AssignedRange)
+            modelBuilder.Entity<Server>().Property(x => x.AssignedRange)
                 .HasConversion(
                     x => $"{x.addr}/{x.cidr}",
                     x => x.ToAddress()
                 );
 
-            modelBuilder.Entity<WireguardServer>().Property(x => x.Dns)
+            modelBuilder.Entity<Server>().Property(x => x.Dns)
                 .HasConversion(
                     x => x.ToString(),
                     x => IPAddress.Parse(x)
